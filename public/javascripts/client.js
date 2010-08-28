@@ -76,11 +76,22 @@
         ctx.partial('views/mixtapes/show.ejs', { mixtape: mixtape });
       });
     });
-
-    $(function() {
-      app.run('#/');
-    });
-
   });
 
- })(jQuery);
+
+  $(function() {
+    $('#player').jPlayer({
+      swfPath: '/javascripts/lib/jplayer',
+      ready: function(){
+        this.element.jPlayer('setFile', 'http://butterteam.com/05 Negative_Thinking.mp3').jPlayer('play');
+      },
+      volume: 50
+    })
+    .jPlayer('onSoundComplete', function(){
+      this.element.jPlayer('play');
+    });
+
+    app.run('#/');
+  });
+
+})(jQuery);

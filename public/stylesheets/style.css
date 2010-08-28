@@ -129,6 +129,10 @@ a {
   border-bottom: none;
 }
 
+.jp-playlist-player a {
+  border-bottom: none;
+}
+
 #vote {
   float: right;
   margin-top: -15px;
