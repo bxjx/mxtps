@@ -23,6 +23,46 @@
             callback(mixtape);   
           });
         }
+      },
+
+      startFaye: function(){
+        this.faye = new Faye.Client('/events');
+        this.mainSubscription = null; 
+        this.subscriptions = []; 
+        Logger = {
+          incoming: function(message, callback) {
+            console.log('incoming', message);
+            callback(message);
+          },
+          outgoing: function(message, callback) {
+            console.log('outgoing', message);
+            callback(message);
+          }
+        };
+        this.faye.addExtension(Logger);
+      },
+
+      subscribeAll: function(){
+        this.mainSubscription = this.faye.subscribe('/mixtapes/*', function(message) {
+          console.info("got ALL message" + JSON.stringify(message));
+        });
+        $.each(this.subscriptions, function(i, sub){ sub.cancel() });
+      },
+
+      subscribeToMixtape: function(mixtape){
+        if (this.subscriptions.length > 10){
+          console.info("cancelled first subscription");
+          this.subscriptions.shift.cancel();
+        }
+        if (this.mainSubscription){
+          this.mainSubscription.cancel();
+        }
+        console.info("subscribing to /mixtapes/" + mixtape._id);
+        this.subscriptions.push(
+          this.faye.subscribe('/mixtapes/' + mixtape._id, function(message) {
+            console.info("got subscribed message" + JSON.stringify(message));
+          })
+        );
       }
     });
   };
@@ -35,9 +75,14 @@
     this.use(Sammy.EJS);
     this.storage  = new Sammy.Store();
 
+    this.before(function() {
+      this.startFaye();
+    });
+
     this.get('#/', function(ctx){
       $.getJSON('/', function(res){
-        ctx.partial('views/index.ejs', { random_mixtapes: res.random_mixtapes, popular_mixtapes: res.popular_mixtapes});
+        ctx.partial('views/index.ejs', { recent_mixtapes: res.recent_mixtapes});
+        ctx.subscribeAll();
       });
     });
 
@@ -73,6 +118,7 @@
 
     this.get('#/mixtapes/:id', function(ctx){
       this.loadMixtape(this.params['id'], function(mixtape){
+        ctx.subscribeToMixtape(mixtape);
         ctx.partial('views/mixtapes/show.ejs', { mixtape: mixtape });
       });
     });
