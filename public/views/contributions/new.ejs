@@ -1,0 +1,25 @@
+<form method='POST' action='#/mixtapes/<%=mixtape._id%>/contributions'>
+  <span>I want want to suggest a song for the mixtape<span>
+  <blockquote>
+    &quot;
+    <%=mixtape.theme%>
+    &quot;
+  </blockquote>
+
+  <div>
+    <label for="artist">Artist</label>
+    <input type='text' name='artist' />
+  </div>
+  <div>
+  <label for="title">Song title</label>
+  <input type='text' name='title' />
+  </div>
+  <div>
+  <label for="comments">Why you think it works:</label>
+  <textarea id="comments" name="comments"></textarea>
+  </div>
+  <ul>
+    <li><a href="#/mixtapes/<%= mixtape.id %>">Cancel</a></li>
+    <ul><input type='submit' value='Submit my suggestion' /></ul>
+  <ul>
+</form>

@@ -74,6 +74,15 @@ app.post('/mixtapes', function(req, res){
   });
 });
 
+app.post('/mixtapes/:id/contributions', function(req, res){
+  Mixtape.findById(req.params.id, function(mixtape){
+    mixtape.contributions.push(new Contribution(req.body));
+    mixtape.save(function(){
+      res.send(JSON.stringify(mixtape));
+    });
+  });
+});
+
 app.get('/mixtapes/:id', function(req, res){
   Mixtape.findById(req.params.id, function(mixtape){
     if (mixtape){

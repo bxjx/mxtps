@@ -2,8 +2,13 @@
 
   var Helpers = function(app) {
     this.helpers({
-      postJSON : function(url, data, success){
+      postJSON: function(url, data, success){
         $.ajax({ url: url, type: 'POST', data: data, dataType: 'json', success: success });
+      },
+
+      loadMixtape:  function(id, callback){
+        // look at a cache first?
+        $.getJSON('/mixtapes/' + id, callback);
       }
     });
   };
@@ -33,8 +38,26 @@
       ctx.partial('views/mixtapes/new.ejs');
     });
 
+    this.get('#/mixtapes/:id/contributions/new', function(ctx){
+      this.loadMixtape(this.params['id'], function(mixtape){
+        ctx.partial('views/contributions/new.ejs', {mixtape : mixtape});
+      });
+    });
+
+    this.post('#/mixtapes/:id/contributions', function(ctx){
+      this.loadMixtape(this.params['id'], function(mixtape){
+        ctx.postJSON(
+          '/mixtapes/' + mixtape._id + '/contributions',
+          {artist: ctx.params['artist'], title: ctx.params['title'], comments: ctx.params['comments']},
+          function(mixtape){
+            ctx.redirect('#/mixtapes/' + mixtape._id)
+          }
+        );
+      });
+    });
+
     this.get('#/mixtapes/:id', function(ctx){
-      $.getJSON('/mixtapes/' + this.params['id'], function(mixtape){
+      this.loadMixtape(this.params['id'], function(mixtape){
         ctx.partial('views/mixtapes/show.ejs', { mixtape: mixtape });
       });
     });
