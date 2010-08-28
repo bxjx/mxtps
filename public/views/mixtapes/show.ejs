@@ -1,0 +1,12 @@
+<h1><%= mixtape.theme %></h1>
+
+<ol class="contributions">
+  <% $.each(mixtape.contributions, function(index, contribution){ %>
+    <li>
+      <span><%=contribution.title + " by " + contribution.artist%></span>
+      <p><%=contribution.comments%></p>
+    </li>
+  <% }) %>
+</ol>
+      
+<a href="#/mixtapes/<%=mixtape._id%>/contributions/new">Suggest a song</a>
