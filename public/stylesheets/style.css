@@ -189,6 +189,7 @@ button:focus, input[type="button"]:focus, input[type="submit"]:focus, a.button:f
 .jp-playlist-player {
   /*display:none;*/
   margin: 0 20px;
+  margin-bottom: -10px;
 }
 
 .left, .right, .full
