@@ -69,7 +69,7 @@ body {
   font-size: 14px;
 }
 
-#copyright,
+#footer,
 #container {
   width: 960px;
   margin: 0 auto;
@@ -78,7 +78,7 @@ body {
 #header,
 #nav,
 #content,
-#footer {
+#footer-container {
   width: 100%;
   padding: 20px;
 }
@@ -93,12 +93,13 @@ body {
 #content {
 }
 
-#footer {
+#footer-container {
   background-color: #333;
   color: #fff;
 }
 
 #copyright {
+  float: left;
   font-size: 12px;
   color: #999;
 }
@@ -115,7 +116,6 @@ h2 {
   
 p {
   font-family: Georgia, "Times New Roman", serif;
-  line-height: 147%;
   font-size: 16px;
 }
 
@@ -123,6 +123,30 @@ a {
   text-decoration: none;
   color: #999;
   border-bottom: 1px #aaa dotted;
+}
+
+#footer a {
+  border-bottom: none;
+}
+
+#vote {
+  float: right;
+  margin-top: -15px;
+}
+
+#twitter {
+  float: right;
+}
+
+#twitter img {
+  height: 32px;
+  -webkit-box-shadow:0 0 32px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow:0 0 32px rgba(0, 0, 0, 0.5);
+}
+
+br.clear {
+  float: none;
+  clear: both;
 }
 
 /* temporary styles (until logo is ready) */
