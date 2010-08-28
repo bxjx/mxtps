@@ -2,20 +2,21 @@
 html
 head
   title mxt.ps 
+  link(rel='stylesheet', href='/stylesheets/style.css')
   script(src='/javascripts/lib/jquery/jquery-1.4.2.min.js')
   script(src='/javascripts/lib/sammy/sammy-0.5.4.min.js')
   script(src='/javascripts/lib/sammy/plugins/sammy.ejs-0.5.4.min.js')
   script(src='/javascripts/client.js')
 body
-  header
-    hgroup
+  #container
+    #header
       h1
         a(href='#/') mxt.ps
-  nav
-    ul
-      li
-        a.button(href='#/mixtapes/new') Create a new mixtape
-
-  #content
-    #controls
-    != body
+    #nav
+      ul
+        li
+          a.button(href='#/mixtapes/new') Create a new mixtape
+    #content
+      != body
+  #footer
+    #copyright &copy; 2010 mxt.ps
