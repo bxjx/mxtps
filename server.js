@@ -1,27 +1,74 @@
 var port = parseInt(process.env.PORT) || 3000;
-
+var mongoUri = process.env.MONGO_URI || 'mongodb://localhost/mixtapes';
 
 // models
 var mongoose = require('./lib/mongoose/mongoose').Mongoose;
-var db = mongoose.connect('mongodb://localhost/mixtapes');
+var db = mongoose.connect(mongoUri);
 
 mongoose.model('Mixtape', {
   // need to validate uniquness of theme
-  properties: ['theme', 'created_at', 'updated_at', {'contributions': []}, 'user'],
+  properties: ['theme', 'slug', 'created_at', 'updated_at', 'id', {'contributions': []}, 'user'],
+  //indexes: [[{ slug: 1 }, {unique: true}]],
   methods: {
     toJSON: function(){
       return this._normalize();
     },
+    id: function(){
+      return this._id.toHexString();
+    },
+    addContribution: function(contribution){
+      this._dirty['contributions'] = true;
+      this.contributions.push(contribution)
+    },
+    save: function(fn){
+      var after_save;
+      var saved_mixtape = this;
+      var contribution;
+      if (this.isNew){
+        this.created_at = new Date();
+        after_save = function(){
+          bayeux.getClient().publish(
+            '/mixtapes/' + saved_mixtape.id(),
+            {what: 'created', when: saved_mixtape.created_at, who: saved_mixtape.user || 'anon', mixtape: saved_mixtape.toObject()}
+          );
+          fn();
+        }
+      }else{
+        if (this._dirty['contributions']){
+          contribution = this.contributions[this.contributions.length - 1];
+          after_save = function(){
+            bayeux.getClient().publish(
+              '/mixtapes/' + saved_mixtape.id(),
+              {what: 'contribution', when: contribution.created_at || new Date(), who: contribution.user, mixtape: saved_mixtape.toObject(), to: contribution.toObject()}
+            );
+            fn();
+          }
+        }else{
+          after_save = fn;
+        }
+      }
+      this.updated_at = new Date();
+      this.__super__(after_save);
+    }
+  },
+  static:  {
+
+    random: function(fn){
+      this.find().all(fn);
+    }
   }
 });
 var Mixtape = db.model('Mixtape',db);
 
 mongoose.model('Contribution', {
-  properties: ['artist', 'title', 'comments'],
+  properties: ['artist', 'title', 'comments', 'mixtape'],
   methods: {
     toJSON: function(){
       return this._normalize();
     },
+    id: function(){
+      return this._id.toHexString();
+    }
   }
 });
 var Contribution = db.model('Contribution',db);
@@ -34,9 +81,6 @@ mongoose.model('User', {
         this.created_at = new Date();
       }
       this.updated_at = new Date();
-
-      // validation should go here: checke email and name are unique
-      
       this.__super__(fn);
     }
   }
@@ -47,9 +91,14 @@ var User = db.model('User',db);
 
 
 
+faye = require('faye');
+var bayeux = new faye.NodeAdapter({
+  mount:    '/events',
+  timeout:  45
+});
+
 var connect = require('connect');
 var express = require('express');
-
 var app = express.createServer(
   connect.bodyDecoder(),
   connect.methodOverride(),
@@ -64,16 +113,14 @@ app.get('/', function(req, res){
   if (!req.xhr){
     res.render('index');
   }else{
-    var popular_mixtapes = [];
-    Mixtape.find().all(function(random_mixtapes){
-      res.send(JSON.stringify({random_mixtapes: random_mixtapes, popular_mixtapes: popular_mixtapes}));
+    Mixtape.random(function(random_mixtapes){
+      res.send(JSON.stringify({random_mixtapes: random_mixtapes}));
     });
   }
 });
 
 app.post('/mixtapes', function(req, res){
   var mixtape = new Mixtape(req.body);
-  //mixtape.user = res.currentUser;
   mixtape.save(function(){
     res.send(JSON.stringify(mixtape));
   });
@@ -81,9 +128,12 @@ app.post('/mixtapes', function(req, res){
 
 app.post('/mixtapes/:id/contributions', function(req, res){
   Mixtape.findById(req.params.id, function(mixtape){
-    mixtape.contributions.push(new Contribution(req.body));
-    mixtape.save(function(){
-      res.send(JSON.stringify(mixtape));
+    var contribution = new Contribution(req.body)
+    contribution.save(function(){
+      mixtape.addContribution(contribution);
+      mixtape.save(function(){
+        res.send(JSON.stringify(mixtape));
+      });
     });
   });
 });
@@ -98,4 +148,5 @@ app.get('/mixtapes/:id', function(req, res){
   });
 });
 
+bayeux.attach(app);
 app.listen(port);

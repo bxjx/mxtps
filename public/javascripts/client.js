@@ -14,15 +14,49 @@
       loadMixtape:  function(id, callback){
         var ctx = this;
         if (ctx.app.storage.exists(id)){
-          console.info("cache hit " + id)
           callback(ctx.app.storage.get(id));
         }else{
-          console.info("cache miss " + id)
           $.getJSON('/mixtapes/' + id, function(mixtape){
             ctx.storeMixtape(mixtape)
             callback(mixtape);   
           });
         }
+      },
+
+      startFaye: function(){
+        this.faye = new Faye.Client('/events');
+        this.subscription = null; 
+      },
+
+      subscribeAll: function(){
+        var ctx = this;
+        this.subscription = this.faye.subscribe('/mixtapes/*', function(message) {
+          ctx.renderEvent(message);
+        });
+        //$.each(this.subscriptions, function(i, sub){ sub.cancel() });
+      },
+
+      subscribeToMixtape: function(mixtape){
+        /*
+        if (this.subscriptions.length > 10){
+          this.subscriptions.shift.cancel();
+        }
+        if (this.mainSubscription){
+          this.mainSubscription.cancel();
+        }
+        var ctx = this;
+        this.subscriptions.push(
+          this.faye.subscribe('/mixtapes/' + mixtape._id, function(message) {
+            ctx.renderEvent(message);
+          })
+        );
+        */
+      },
+
+      renderEvent : function(subEvent){
+        this.partial('views/events/show.ejs', {subEvent: subEvent}, function(rendered) {
+          $('#events').prepend(rendered).children(':first').hide().fadeIn(2000);
+        });
       }
     });
   };
@@ -35,13 +69,20 @@
     this.use(Sammy.EJS);
     this.storage  = new Sammy.Store();
 
+    /*
     this.bind('changed', function(){
       $('input, textarea').filter(':first').focus();
+    });
+    */
+
+    this.before(function() {
+      this.startFaye();
     });
 
     this.get('#/', function(ctx){
       $.getJSON('/', function(res){
-        ctx.partial('views/index.ejs', { random_mixtapes: res.random_mixtapes, popular_mixtapes: res.popular_mixtapes});
+        ctx.subscribeAll();
+        ctx.partial('views/index.ejs', { random_mixtapes: res.random_mixtapes, popular_mixtapes: []});
       });
     });
 
@@ -77,6 +118,7 @@
 
     this.get('#/mixtapes/:id', function(ctx){
       this.loadMixtape(this.params['id'], function(mixtape){
+        ctx.subscribeToMixtape(mixtape);
         ctx.partial('views/mixtapes/show.ejs', { mixtape: mixtape });
       });
     });

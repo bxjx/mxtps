@@ -9,6 +9,7 @@ head
   script(src='/javascripts/lib/sammy/plugins/sammy.ejs-0.5.4.min.js')
   script(src='/javascripts/lib/sammy/plugins/sammy.storage.js')
   script(src='/javascripts/lib/jplayer/jquery.jplayer.min.js')
+  script(src='/javascripts/lib/faye-browser-min.js')
   script(src='/javascripts/client.js')
 body
   #container
@@ -47,6 +48,11 @@ body
       #jplayer_playlist.jp-playlist
     #content
       != body
+    br.clear
+    #activity
+      h1 Recent activity
+      #events.full
+
   #footer-container
     #footer
       #twitter
