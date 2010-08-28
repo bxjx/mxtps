@@ -1,0 +1,159 @@
+/* http://meyerweb.com/eric/tools/css/reset/ */
+/* v1.0 | 20080212 */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+  outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+  text-decoration: none;
+}
+del {
+  text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* end of css reset */
+
+
+/* mxt.ps */
+
+html, body, #container { height: 100%; }
+body > #container { height: auto; min-height: 100%; }
+
+
+
+body {
+  background-color: #fff;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  line-height: 170%;
+  font-size: 14px;
+}
+
+#footer,
+#container {
+  width: 960px;
+  margin: 0 auto;
+}
+
+#header,
+#nav,
+#content,
+#footer-container {
+  width: 100%;
+  padding: 20px;
+}
+
+#header {
+  margin-top: 20px;
+}
+
+#nav {
+}
+
+#content {
+}
+
+#footer-container {
+  background-color: #333;
+  color: #fff;
+}
+
+#copyright {
+  float: left;
+  font-size: 12px;
+  color: #999;
+}
+
+h1 {
+  color: #000;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+h2 {
+  font-size: 16px;
+}
+  
+p {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+}
+
+a {
+  text-decoration: none;
+  color: #999;
+  border-bottom: 1px #aaa dotted;
+}
+
+#footer a {
+  border-bottom: none;
+}
+
+#vote {
+  float: right;
+  margin-top: -15px;
+}
+
+#twitter {
+  float: right;
+}
+
+#twitter img {
+  height: 32px;
+  -webkit-box-shadow:0 0 32px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow:0 0 32px rgba(0, 0, 0, 0.5);
+}
+
+br.clear {
+  float: none;
+  clear: both;
+}
+
+/* temporary styles (until logo is ready) */
+
+#header h1 a {
+  font-size: 72px;
+  color: #f06;
+  border-bottom: none;
+}
+
