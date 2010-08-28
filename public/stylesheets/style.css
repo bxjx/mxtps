@@ -138,9 +138,6 @@ a {
 #footer a {
   border-bottom: none;
 }
-.jp-playlist-player {
-  display:none;
-}
 
 .jp-playlist-player a {
   border-bottom: none;
@@ -187,6 +184,11 @@ button, input[type="button"], input[type="submit"], a.button {
 button:hover, input[type="button"]:hover, input[type="submit"]:hover, a.button:hover,
 button:focus, input[type="button"]:focus, input[type="submit"]:focus, a.button:focus {
   box-shadow: 0 0 4px rgba(51,51,51,1.0); -webkit-box-shadow: 0 0 4px rgba(51,51,51,1.0); -moz-box-shadow: 0 0 4px rgba(51,51,51,1.0);
+}
+
+.jp-playlist-player {
+  /*display:none;*/
+  margin: 0 20px;
 }
 
 .left, .right, .full
