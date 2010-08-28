@@ -1,6 +1,17 @@
-<h1>Recent mixtapes</h1>
+<h1>Random mixtapes</h1>
+<div id="random" class="left">
 <ul>
-  <% $.each(recent_mixtapes, function(index, mixtape){ %>
+  <% $.each(random_mixtapes, function(index, mixtape){ %>
   <li><a href="#/mixtapes/<%= mixtape._id %>"><%= mixtape.theme %></a></li>
   <% }); %>
 </ul>
+</div>
+
+<h1>Popular mixtapes</h1>
+<div id="popular" class="right">
+<ul>
+  <% $.each(popular_mixtapes, function(index, mixtape){ %>
+  <li><a href="#/mixtapes/<%= mixtape._id %>"><%= mixtape.theme %></a></li>
+  <% }); %>
+</ul>
+</div>

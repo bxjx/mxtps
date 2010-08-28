@@ -14,10 +14,8 @@
       loadMixtape:  function(id, callback){
         var ctx = this;
         if (ctx.app.storage.exists(id)){
-          console.info("cache hit " + id)
           callback(ctx.app.storage.get(id));
         }else{
-          console.info("cache miss " + id)
           $.getJSON('/mixtapes/' + id, function(mixtape){
             ctx.storeMixtape(mixtape)
             callback(mixtape);   
@@ -27,42 +25,38 @@
 
       startFaye: function(){
         this.faye = new Faye.Client('/events');
-        this.mainSubscription = null; 
-        this.subscriptions = []; 
-        Logger = {
-          incoming: function(message, callback) {
-            console.log('incoming', message);
-            callback(message);
-          },
-          outgoing: function(message, callback) {
-            console.log('outgoing', message);
-            callback(message);
-          }
-        };
-        this.faye.addExtension(Logger);
+        this.subscription = null; 
       },
 
       subscribeAll: function(){
-        this.mainSubscription = this.faye.subscribe('/mixtapes/*', function(message) {
-          console.info("got ALL message" + JSON.stringify(message));
+        var ctx = this;
+        this.subscription = this.faye.subscribe('/mixtapes/*', function(message) {
+          ctx.renderEvent(message);
         });
-        $.each(this.subscriptions, function(i, sub){ sub.cancel() });
+        //$.each(this.subscriptions, function(i, sub){ sub.cancel() });
       },
 
       subscribeToMixtape: function(mixtape){
+        /*
         if (this.subscriptions.length > 10){
-          console.info("cancelled first subscription");
           this.subscriptions.shift.cancel();
         }
         if (this.mainSubscription){
           this.mainSubscription.cancel();
         }
-        console.info("subscribing to /mixtapes/" + mixtape._id);
+        var ctx = this;
         this.subscriptions.push(
           this.faye.subscribe('/mixtapes/' + mixtape._id, function(message) {
-            console.info("got subscribed message" + JSON.stringify(message));
+            ctx.renderEvent(message);
           })
         );
+        */
+      },
+
+      renderEvent : function(subEvent){
+        this.partial('views/events/show.ejs', {subEvent: subEvent}, function(rendered) {
+          $('#events').prepend(rendered).children(':first').hide().fadeIn(2000);
+        });
       }
     });
   };
@@ -75,14 +69,20 @@
     this.use(Sammy.EJS);
     this.storage  = new Sammy.Store();
 
+    /*
+    this.bind('changed', function(){
+      $('input, textarea').filter(':first').focus();
+    });
+    */
+
     this.before(function() {
       this.startFaye();
     });
 
     this.get('#/', function(ctx){
       $.getJSON('/', function(res){
-        ctx.partial('views/index.ejs', { recent_mixtapes: res.recent_mixtapes});
         ctx.subscribeAll();
+        ctx.partial('views/index.ejs', { random_mixtapes: res.random_mixtapes, popular_mixtapes: []});
       });
     });
 
@@ -126,7 +126,7 @@
 
 
   $(function() {
-    $('#player').jPlayer({
+    /*$('#player').jPlayer({
       swfPath: '/javascripts/lib/jplayer',
       ready: function(){
         this.element.jPlayer('setFile', 'http://butterteam.com/05 Negative_Thinking.mp3').jPlayer('play');
@@ -135,7 +135,7 @@
     })
     .jPlayer('onSoundComplete', function(){
       this.element.jPlayer('play');
-    });
+    });*/
 
     app.run('#/');
   });

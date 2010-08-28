@@ -29,7 +29,7 @@ mongoose.model('Mixtape', {
         after_save = function(){
           bayeux.getClient().publish(
             '/mixtapes/' + saved_mixtape.id(),
-            {what: 'created', when: saved_mixtape.created_at, who: saved_mixtape.user || 'anon', to: saved_mixtape.toObject()}
+            {what: 'created', when: saved_mixtape.created_at, who: saved_mixtape.user || 'anon', mixtape: saved_mixtape.toObject()}
           );
           fn();
         }
@@ -39,7 +39,7 @@ mongoose.model('Mixtape', {
           after_save = function(){
             bayeux.getClient().publish(
               '/mixtapes/' + saved_mixtape.id(),
-              {what: 'contribution', when: contribution.created_at, who: contribution.user || 'anon', to: contribution.toObject()}
+              {what: 'contribution', when: contribution.created_at || new Date(), who: contribution.user, mixtape: saved_mixtape.toObject(), to: contribution.toObject()}
             );
             fn();
           }
@@ -53,7 +53,7 @@ mongoose.model('Mixtape', {
   },
   static:  {
 
-    recent: function(fn){
+    random: function(fn){
       this.find().all(fn);
     }
   }
@@ -113,8 +113,8 @@ app.get('/', function(req, res){
   if (!req.xhr){
     res.render('index');
   }else{
-    Mixtape.recent(function(recent_mixtapes){
-      res.send(JSON.stringify({recent_mixtapes: recent_mixtapes}));
+    Mixtape.random(function(random_mixtapes){
+      res.send(JSON.stringify({random_mixtapes: random_mixtapes}));
     });
   }
 });
