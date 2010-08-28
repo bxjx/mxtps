@@ -108,10 +108,14 @@ h1 {
   color: #000;
   font-size: 22px;
   font-weight: 400;
+  margin-top: 10px;
+  padding-top: 10px;
 }
 
 h2 {
   font-size: 16px;
+  margin-top: 10px;
+  padding-top: 10px;
 }
   
 p {
@@ -127,6 +131,9 @@ a {
 
 #footer a {
   border-bottom: none;
+}
+.jp-playlist-player {
+  display:none;
 }
 
 .jp-playlist-player a {
@@ -144,13 +151,91 @@ a {
 
 #twitter img {
   height: 32px;
-  -webkit-box-shadow:0 0 32px rgba(0, 0, 0, 0.5);
-  -moz-box-shadow:0 0 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 32px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 0 32px rgba(0, 0, 0, 0.5); -moz-box-shadow: 0 0 32px rgba(0, 0, 0, 0.5);
 }
 
 br.clear {
   float: none;
   clear: both;
+}
+
+input[type="text"], textarea {
+  border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;
+  background-color: #f2f2f2;
+  padding: 16px;
+  width: 100%;
+  border: 1px solid #f2f2f2;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 100;
+  font-size: 22px;
+}
+
+input[type="text"]:focus, textarea:focus {
+  box-shadow: 0 0 4px rgba(200,200,200,1.0); -webkit-box-shadow: 0 0 4px rgba(200,200,200,1.0); -moz-box-shadow: 0 0 4px rgba(200,200,200,1.0);
+}
+
+button, input[type="button"], input[type="submit"], a.button {
+  cursor: pointer;
+  border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;
+  padding: 10px;
+  border: 0;
+  background-color: #333;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
+button:hover, input[type="button"]:hover, input[type="submit"]:hover, a.button:hover,
+button:focus, input[type="button"]:focus, input[type="submit"]:focus, a.button:focus {
+  box-shadow: 0 0 4px rgba(51,51,51,1.0); -webkit-box-shadow: 0 0 4px rgba(51,51,51,1.0); -moz-box-shadow: 0 0 4px rgba(51,51,51,1.0);
+}
+
+.left, .right, .full
+{
+  border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;
+  background-color: #f2f2f2;
+  padding: 16px;
+  margin: 10px;
+  float: left;
+}
+.left, .full {
+  margin-left: 0;
+  width: 428px;
+}
+.right, .full {
+  margin-right: 0;
+  width: 428px;
+}
+.full {
+  width: 906px;
+}
+
+#contributions {
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  -webkit-column-rule: 1px solid #ccc;
+  -moz-column-rule: 1px solid #ccc;
+}
+
+#contributions ol {
+  list-style: decimal;
+  padding-left: 20px;
+  width: 428px;
+}
+
+#contributions ol li span {
+}
+
+#contributions ol li p {
+  display: none;
+  font-size: 12px;
+  color: #999;
+}
+
+h1.theme {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 100;
+  font-size: 36px;
+  padding:20px 0;
 }
 
 /* temporary styles (until logo is ready) */

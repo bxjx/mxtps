@@ -1,25 +1,20 @@
 <form method='POST' action='#/mixtapes/<%=mixtape._id%>/contributions'>
-  <span>I want want to suggest a song for the mixtape<span>
-  <blockquote>
-    &quot;
-    <%=mixtape.theme%>
-    &quot;
-  </blockquote>
+  <h1 class="theme"><%=mixtape.theme%></h1>
 
   <div>
-    <label for="artist">Artist</label>
-    <input type='text' name='artist' />
+    <label for="f_artist">Artist</label>
+    <input type='text' name='artist' id="f_artist" />
   </div>
   <div>
-  <label for="title">Song title</label>
-  <input type='text' name='title' />
+  <label for="f_title">Song title</label>
+  <input type='text' name='title' id="f_title" />
   </div>
   <div>
-  <label for="comments">Why you think it works:</label>
-  <textarea id="comments" name="comments"></textarea>
+  <label for="f_comments">Why you think it works:</label>
+  <textarea name="comments" id="f_comments"></textarea>
   </div>
   <ul>
-    <li><a href="#/mixtapes/<%= mixtape.id %>">Cancel</a></li>
-    <ul><input type='submit' value='Submit my suggestion' /></ul>
+    <!-- li><a class="button" href="#/mixtapes/<%= mixtape.id %>">Cancel</a></li -->
+    <li><input type='submit' value='Add my song' /></li>
   <ul>
 </form>

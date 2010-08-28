@@ -35,6 +35,10 @@
     this.use(Sammy.EJS);
     this.storage  = new Sammy.Store();
 
+    this.bind('changed', function(){
+      $('input, textarea').filter(':first').focus();
+    });
+
     this.get('#/', function(ctx){
       $.getJSON('/', function(res){
         ctx.partial('views/index.ejs', { random_mixtapes: res.random_mixtapes, popular_mixtapes: res.popular_mixtapes});
@@ -80,7 +84,7 @@
 
 
   $(function() {
-    $('#player').jPlayer({
+    /*$('#player').jPlayer({
       swfPath: '/javascripts/lib/jplayer',
       ready: function(){
         this.element.jPlayer('setFile', 'http://butterteam.com/05 Negative_Thinking.mp3').jPlayer('play');
@@ -89,7 +93,7 @@
     })
     .jPlayer('onSoundComplete', function(){
       this.element.jPlayer('play');
-    });
+    });*/
 
     app.run('#/');
   });
