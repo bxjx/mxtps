@@ -17,7 +17,12 @@ mongoose.model('Mixtape', {
 var Mixtape = db.model('Mixtape',db);
 
 mongoose.model('Contribution', {
-  properties: ['artist', 'title', 'comments']
+  properties: ['artist', 'title', 'comments'],
+  methods: {
+    toJSON: function(){
+      return this._normalize();
+    },
+  }
 });
 var Contribution = db.model('Contribution',db);
 mongoose.model('User', {
