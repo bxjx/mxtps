@@ -1,5 +1,6 @@
 var port = parseInt(process.env.PORT) || 3000;
-var mongoUri = process.env.MONGO_URI || 'mongodb://localhost/mixtapes';
+//var mongoUri = process.env.MONGO_URI || 'mongodb://localhost/mixtapes';
+var mongoUri = "mongodb://nodeko:1bbec29edb5@nodeko.mongohq.com:27089/rough-ring";
 
 // models
 var mongoose = require('./lib/mongoose/mongoose').Mongoose;
