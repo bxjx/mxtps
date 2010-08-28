@@ -1,9 +1,9 @@
 var port = parseInt(process.env.PORT) || 3000;
-
+var mongoUri = parseInt(process.env.MONGO_URI || 'mongodb://localhost/mixtapes';
 
 // models
 var mongoose = require('./lib/mongoose/mongoose').Mongoose;
-var db = mongoose.connect('mongodb://localhost/mixtapes');
+var db = mongoose.connect(mongoUri);
 
 mongoose.model('Mixtape', {
   // need to validate uniquness of theme
