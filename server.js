@@ -15,7 +15,7 @@ var app = express.createServer(
 app.set('view engine', 'ejs');
 
 app.get('/', function(req, res){
-  res.send('hi');
+  res.send('ohai');
 });
 
 app.listen(port);
