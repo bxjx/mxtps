@@ -265,3 +265,7 @@ h1.theme {
 #popular ol{
   list-style: decimal inside;
 }
+
+.buttons{
+  margin-top: 20px;
+}
