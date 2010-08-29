@@ -151,10 +151,6 @@ a {
   position: fixed; top: 18px; right: 125px; border: 0px;
 }
 
-#twitter img {
-  box-shadow: 0 0 20px rgba(128,128,128,0.7); -webkit-box-shadow: 0 0 20px rgba(128,128,128,0.7); -moz-box-shadow: 0 0 20px rgba(128,128,128,0.7);
-}
-
 br.clear {
   float: none;
   clear: both;
@@ -192,8 +188,16 @@ button:focus, input[type="button"]:focus, input[type="submit"]:focus, a.button:f
 
 .jp-playlist-player {
   /*display:none;*/
-  margin: 10px 20px;
-  margin-bottom: -10px;
+  margin-top: -7px;
+  margin-right: 0;
+  float: left;
+  width: 428px;
+}
+
+#nav ul {
+  float: left;
+  width: 428px;
+  margin-right:52px;
 }
 
 .left, .right, .full
