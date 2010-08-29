@@ -46,12 +46,13 @@ body
         #jplayer_play_time.jp-play-time
         #jplayer_total_time.jp-total-time
       #jplayer_playlist.jp-playlist
-    #content
-      != body
-    br.clear
-    #activity
-      h1 Recent activity
-      #events.full
+    #content-container
+      #content
+        != body
+      br.clear
+        #activity.full
+          h1 Recent activity
+          #events
 
   #footer-container
     #footer
