@@ -65,6 +65,7 @@ mongoose.model('Mixtape', {
       return this.errors.length == 0;
     },
     addContribution: function(contribution){
+      contribution.mixtape_id = this._id;
       this._dirty['contributions'] = true;
       this.contributions.push(contribution)
     },
@@ -142,8 +143,8 @@ function check_url_status(url, cb) {
     console.info(JSON.stringify(response.headers));
     if (response.headers.location) {
       console.info("redirected!  checking " + response.headers.location);
-      // TODO: response.headers.location string contains the url plus "undefined"
-      // assume 200 for now
+      // TODO: response.headers.location string == url+"undefined" ?? assume 200 for now
+      // TODO: enforce redirect limit
       // check_url_status(response.headers.location, cb);
       cb(200);
     } else {
@@ -153,7 +154,7 @@ function check_url_status(url, cb) {
 };
 
 mongoose.model('Contribution', {
-  properties: ['artist', 'title', 'comments', 'url', 'user', 'url_status'],
+  properties: ['artist', 'title', 'comments', 'url', 'user', 'url_status', 'created_at', 'mixtape_id'],
   methods: {
     toJSON: function(){
       var o = this._normalize();
@@ -185,7 +186,17 @@ mongoose.model('Contribution', {
             Contribution.findById(that._id, function(contribution){
               contribution.url_status = statusCode;
               console.info("url check complete: " + contribution.url + " is HTTP " + contribution.url_status);
-              contribution.save(fn);
+              Mixtape.findById(contribution.mixtape_id, function(mixtape){
+                contribution.save(function(){
+                  var e = new MxtpsEvent();
+                  e.what = 'mp3ok';
+                  e.when = new Date();
+                  e.who = null;
+                  e.to = contribution;
+                  e.mixtape = mixtape;
+                  e.save(fn);
+                });
+              });
             });
           });
         };

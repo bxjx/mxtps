@@ -15,5 +15,8 @@
   <% if (subEvent.what == 'closed') {%>
     <a href="#/mixtapes/<%=subEvent.mixtape._id%>"><%=subEvent.mixtape.theme%></a> reached 10 songs and was closed!
   <% } %>
+  <% if (subEvent.what == 'mp3ok') {%>
+    the <em>&quot;<%=subEvent.to.title%>&quot;</em> mp3 on <a href="#/mixtapes/<%=subEvent.mixtape._id%>"><%=subEvent.mixtape.theme%></a> was verified
+  <% } %>
 </div>
   
