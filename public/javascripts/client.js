@@ -118,6 +118,32 @@
           $(this).blur();
           // TODO: set "now playing" track name
         });
+      },
+
+      addRecentEvents : function(){
+        var ctx = this;
+        ctx.clearEvents();
+        $.getJSON('/recent_events', function(events){
+          $.each(events, function(i, e){
+            ctx.renderEvent(e);
+          });
+        });
+      },
+
+      clearEvents : function(){
+        $.each($('#events').children('.event'), function(i, e){
+          $(e).fadeOut(2000);
+        });
+      },
+
+      addRecentEventsForMixtape : function(mixtape){
+        var ctx = this;
+        ctx.clearEvents();
+        $.getJSON('/mixtapes/' + mixtape._id + '/recent_events', function(events){
+          $.each(events, function(i, e){
+            ctx.renderEvent(e);
+          });
+        });
       }
     });
   };
@@ -146,6 +172,7 @@
       $.getJSON('/', function(mixtape_collections){
         ctx.subscribeAll();
         ctx.partial('views/index.ejs', mixtape_collections);
+        ctx.addRecentEvents();
       });
     });
 
@@ -182,12 +209,16 @@
     this.get('#/mixtapes/:id', function(ctx){
       this.loadMixtape(this.params['id'], function(mixtape){
         ctx.partial('views/mixtapes/show.ejs', { mixtape: mixtape });
+        ctx.addRecentEventsForMixtape(mixtape);
       });
     });
   });
 
 
   $(function() {
+    $("abbr.timeago").livequery(function(){
+      $(this).timeago();
+    });
     app.run('#/');
   });
 
