@@ -237,8 +237,7 @@ button:focus, input[type="button"]:focus, input[type="submit"]:focus, a.button:f
 #contributions ol li span {
 }
 
-#contributions ol li p {
-  display: none;
+#contributions ol li .quote {
   font-size: 12px;
   color: #999;
 }
@@ -268,4 +267,16 @@ h1.theme {
 
 .buttons{
   margin-top: 20px;
+}
+
+.song{
+  color: #F06;
+}
+
+.contribution span{
+  font-size: 0.8em;
+}
+
+.closed_message{
+  margin-left:20px;
 }

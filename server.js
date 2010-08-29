@@ -159,6 +159,7 @@ mongoose.model('Contribution', {
       var o = this._normalize();
       if (this.errors)
         o['errors'] = this.errors;
+      o['status'] = this.url_status == 200 ? 'found' : 'pending';
       return o;
     },
     valid : function(){
