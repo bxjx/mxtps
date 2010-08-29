@@ -148,7 +148,11 @@ a {
 }
 
 #twitter {
-  float: right;
+  position: fixed; top: 18px; right: 125px; border: 0px;
+}
+
+#twitter img {
+  box-shadow: 0 0 20px rgba(128,128,128,0.7); -webkit-box-shadow: 0 0 20px rgba(128,128,128,0.7); -moz-box-shadow: 0 0 20px rgba(128,128,128,0.7);
 }
 
 br.clear {

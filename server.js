@@ -55,11 +55,11 @@ mongoose.model('Mixtape', {
 
     random: function(fn){
       var direction = !Math.round(Math.random()) ? 1 : -1;
-      this.find({}).sort([['updated_at', direction]]).all(fn);
+      this.find({}).sort([['updated_at', direction]]).limit(5).all(fn);
     }, 
 
     popular: function(fn){
-      this.find({}).sort([['play_count', -1]]).all(fn);
+      this.find({'play_count': {'$gt':1}}).sort([['play_count', -1]]).limit(10).all(fn);
     },
   }
 });
