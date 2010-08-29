@@ -21,7 +21,7 @@ mongoose.model('MxtpsEvent', {
           this.when = new Date();
         if (!this.mixtape_id)
           this.mixtape_id = this.mixtape._id;
-        //console.info('sending off ' + JSON.stringify(this.toObject()) + ' to ' +  '/mixtapes/' + this.mixtape.id());
+        console.info('sending off ' + JSON.stringify(this.toObject()) + ' to ' +  '/mixtapes/' + this.mixtape.id());
         bayeux.getClient().publish('/mixtapes/' + this.mixtape.id(), this.toObject());
       }
       this.__super__(fn);
@@ -66,7 +66,6 @@ mongoose.model('Mixtape', {
     },
     addContribution: function(contribution){
       contribution.created_at = new Date();
-      contribution.url_status = 200;
       contribution.mixtape_id = this._id;
       this._dirty['contributions'] = true;
       this.contributions.push(contribution.toObject())
@@ -157,13 +156,12 @@ function check_url_status(url, cb) {
 };
 
 mongoose.model('Contribution', {
-  properties: ['artist', 'title', 'comments', 'url', 'user', 'url_status', 'created_at', 'mixtape_id'],
+  properties: ['artist', 'title', 'comments', 'url', 'user', 'url_status', 'created_at', 'mixtape_id', 'status'],
   methods: {
     toObject: function(){
       var o = this.__super__();
       if (this.errors)
         o['errors'] = this.errors;
-      o['status'] = this.url_status == 200 ? 'found' : 'pending';
       return o;
     },
     valid : function(){
@@ -246,12 +244,24 @@ function lookForMp3(mixtape, contribution){
       if (match){
         var mp3Url = querystring.unescape(match[1]);
         contribution.url = mp3Url;
+        contribution.url_status = 200;
+        contribution.status = 'found';
         mixtape.save(function(){
-          console.log('did we save the mixtape? with ' + mp3Url);
+          publishMp3Ok(mixtape, contribution);
         });
       }
     });
   });
+}
+
+function publishMp3Ok(mixtape, contribution){
+  var e = new MxtpsEvent();
+  e.what = 'mp3ok';
+  e.when = new Date();
+  e.who = null;
+  e.to = contribution;
+  e.mixtape = mixtape;
+  e.save();
 }
 
 app.get('/', function(req, res){
@@ -295,13 +305,18 @@ app.post('/mixtapes/:id/contributions', function(req, res){
     var contribution = new Contribution(req.body)
     if (/^http/.test(contribution.url)){
       contribution.url_status = 200;
+      contribution.status == 'unverified';
     }
     mixtape.addContribution(contribution);
     if (contribution.valid()){
       if (mixtape.valid()){
         mixtape.save(function(){
           res.send(JSON.stringify(mixtape));
-          lookForMp3(mixtape, contribution);
+          if (contribution.url_status == 200){
+            publishMp3Ok(mixtape, contribution);
+          }else{
+            lookForMp3(mixtape, contribution);
+          }
         });
       }else{
         res.send(JSON.stringify(mixtape));
