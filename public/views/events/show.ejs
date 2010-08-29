@@ -1,15 +1,19 @@
 <div class="event">
-  <abbr class="timeago" title="<%=subEvent.when%>"><%=subEvent.when%></abbr>, <%=subEvent.who%>
-  <% if (subEvent.what == 'created'){%>
-    created a new mixtape called
+  <abbr class="timeago" title="<%=subEvent.when%>"><%=subEvent.when%></abbr>, 
+  <% if (subEvent.what == 'created') {%>
+    <%=subEvent.who%> created a new mixtape called
     <a href="#/mixtapes/<%=subEvent.mixtape._id%>"><%=subEvent.mixtape.theme%></a>.
-  <% }else{ %>
-    contibuted the song <%=subEvent.to.title%> by <%=subEvent.to.artist%> to
+  <% } %>
+  <% if (subEvent.what == 'contribution') {%>
+    <%=subEvent.who%> contibuted the song <%=subEvent.to.title%> by <%=subEvent.to.artist%> to
     <a href="#/mixtapes/<%=subEvent.mixtape._id%>"><%=subEvent.mixtape.theme%></a>
     <% if (subEvent.to.comments){ %>
-    because <em>&quot;<%=subEvent.to.comments %>&quot;</em>
+      because <em>&quot;<%=subEvent.to.comments %>&quot;</em>
     <% } %>
     .
+  <% } %>
+  <% if (subEvent.what == 'closed') {%>
+    <a href="#/mixtapes/<%=subEvent.mixtape._id%>"><%=subEvent.mixtape.theme%></a> reached 10 songs and was closed!
   <% } %>
 </div>
   

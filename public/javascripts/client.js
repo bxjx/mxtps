@@ -206,7 +206,7 @@
       this.loadMixtape(this.params['id'], function(mixtape){
         ctx.postJSON(
           '/mixtapes/' + mixtape._id + '/contributions',
-          {artist: ctx.params['artist'], title: ctx.params['title'], comments: ctx.params['comments'], url: ctx.params['url']},
+          {artist: ctx.params['artist'], title: ctx.params['title'], comments: ctx.params['comments'], url: ctx.params['url'], user: ctx.params['user']},
           function(returned_mixtape){
             if (returned_mixtape.errors.length){
               ctx.errorDialog(returned_mixtape);
