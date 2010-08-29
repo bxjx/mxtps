@@ -54,7 +54,7 @@ mongoose.model('Mixtape', {
   static:  {
 
     random: function(fn){
-      this.find({}).sort([['updated_at', -1]]).all(fn);
+      this.find({}).sort([['updated_at', -1]]).limit(5).all(fn);
     }
   }
 });
