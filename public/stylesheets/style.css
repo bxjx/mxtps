@@ -194,7 +194,7 @@ button:focus, input[type="button"]:focus, input[type="submit"]:focus, a.button:f
   width: 428px;
 }
 
-#nav ul {
+#navleft {
   float: left;
   width: 428px;
   margin-right:52px;
@@ -283,4 +283,11 @@ h1.theme {
 
 .closed_message{
   margin-left:20px;
+}
+
+#now-playing {
+  font-size: 12px;
+}
+#current-track {
+  font-style: italic;
 }

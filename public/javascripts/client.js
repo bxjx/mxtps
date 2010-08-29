@@ -28,7 +28,7 @@
   };
   Playlist.prototype.getCurrentTitle = function() {
     if (this.current()) {
-      return this.items[this.index].title;
+      return this.items[this.index].title + ' by ' + this.items[this.index].artist;
     }
   }
   Playlist.prototype.setItems = function(items) {

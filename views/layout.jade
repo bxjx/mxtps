@@ -23,9 +23,11 @@ body
       h1
         a(href='#/') mxt.ps
     #nav
-      ul
-        li
-          a.button(href='#/mixtapes/new') Create a new mixtape
+      #navleft
+        ul
+          li
+            a.button(href='#/mixtapes/new') Create a new mixtape
+        #now-playing
       .jp-playlist-player
         .jp-interface
           ul.jp-controls
@@ -51,9 +53,8 @@ body
           #jplayer_play_time.jp-play-time
           #jplayer_total_time.jp-total-time
         #jplayer_playlist.jp-playlist
-        #now-playing
       br.clear
-      #player
+    #player
     #content-container
       #content
         != body
