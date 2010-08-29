@@ -69,6 +69,18 @@
         });
       },
 
+      playMixtape : function(id) {
+        var ctx = this;
+        this.loadMixtape(id, function(mixtape){
+          var items = $.map(mixtape.contributions, function(contribution){
+            return contribution.url;
+          });
+          ctx.playlist.setItems(items);
+          ctx.player.jPlayer("setFile", ctx.playlist.getCurrentUrl()).jPlayer('play');
+          ctx.postJSON('/mixtapes/'+mixtape._id+'/played');
+        });
+      },
+
       initPlayer : function(){
         var ctx = this;
         ctx.player = $("#player");
@@ -81,33 +93,30 @@
           }
         }).jPlayer('onSoundComplete', function(){
           if (ctx.playlist.next()) {
-            this.element.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
+            ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
           }
-          // TODO: set "now playing" track name?
+          // TODO: set "now playing" track name
         });
 
         $('#play-mixtape').live('click', function(){
-          // TODO: pull in actual mixtape urls, title, etc.
-          ctx.playlist.setItems([
-            "http://butterteam.com/05 Negative_Thinking.mp3",
-            "http://a1926.g.akamai.net/downloadstor.download.akamai.com/mtv.com/downloads/mp3/a/arcade_fire/arcade_fire_rebellion.mp3"
-          ]);
-          // TODO: set "now playing" to mixtape title.
-          ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
+          var currentMixtapeId = window.location.hash.replace(/^#\/mixtapes\/([0-9a-f]+)$/, '$1');
+          ctx.playMixtape(currentMixtapeId);
         });
 
         $('.jp-next').live('click', function(){
           if (ctx.playlist.next()) {
             ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
           }
-          // TODO: set "now playing" track name?
+          $(this).blur();
+          // TODO: set "now playing" track name
         });
 
         $('.jp-previous').live('click', function(){
           if (ctx.playlist.prev()) {
             ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
           }
-          // TODO: set "now playing" track name?
+          $(this).blur();
+          // TODO: set "now playing" track name
         });
       }
     });
