@@ -29,6 +29,12 @@
 
   var Helpers = function(app) {
     this.helpers({
+      errorDialog: function(o){
+        $('#dialog')
+          .text("Couldn't save mixtape because: " + _.reduce(o.errors, function(s, w){ return s == '' ? w : s + ", " + w; }, ''))
+          .dialog({ modal: true });
+      },
+
       postJSON: function(url, data, success){
         $.ajax({ url: url, type: 'POST', data: data, dataType: 'json', success: success });
       },
@@ -58,9 +64,11 @@
 
       subscribeAll: function(){
         var ctx = this;
-        this.subscription = this.faye.subscribe('/mixtapes/*', function(message) {
-          ctx.renderEvent(message);
-        });
+        if (!this.subscription){
+          this.subscription = this.faye.subscribe('/mixtapes/*', function(message) {
+            ctx.renderEvent(message);
+          });
+        }
       },
 
       renderEvent : function(subEvent){
@@ -124,7 +132,7 @@
         var ctx = this;
         ctx.clearEvents();
         $.getJSON('/recent_events', function(events){
-          $.each(events, function(i, e){
+          $.each(events.reverse(), function(i, e){
             ctx.renderEvent(e);
           });
         });
@@ -140,7 +148,7 @@
         var ctx = this;
         ctx.clearEvents();
         $.getJSON('/mixtapes/' + mixtape._id + '/recent_events', function(events){
-          $.each(events, function(i, e){
+          $.each(events.reverse(), function(i, e){
             ctx.renderEvent(e);
           });
         });
@@ -166,20 +174,24 @@
 
     this.before(function() {
       this.startFaye();
+      this.subscribeAll();
     });
 
     this.get('#/', function(ctx){
       $.getJSON('/', function(mixtape_collections){
-        ctx.subscribeAll();
         ctx.partial('views/index.ejs', mixtape_collections);
         ctx.addRecentEvents();
       });
     });
 
     this.post('#/mixtapes', function(ctx){
-      ctx.postJSON('/mixtapes', {theme : ctx.params['theme']}, function(mixtape){
-        ctx.storeMixtape(mixtape);
-        ctx.redirect('#/mixtapes/' + mixtape._id)
+      ctx.postJSON('/mixtapes', {theme : ctx.params['theme'], user: ctx.params['user']}, function(mixtape){
+        if (mixtape.errors.length){
+          ctx.errorDialog(mixtape);
+        }else{
+          ctx.storeMixtape(mixtape);
+          ctx.redirect('#/mixtapes/' + mixtape._id)
+        }
       });
     });
 
@@ -199,8 +211,12 @@
           '/mixtapes/' + mixtape._id + '/contributions',
           {artist: ctx.params['artist'], title: ctx.params['title'], comments: ctx.params['comments'], url: ctx.params['url']},
           function(returned_mixtape){
-            ctx.storeMixtape(returned_mixtape);
-            ctx.redirect('#/mixtapes/' + returned_mixtape._id)
+            if (returned_mixtape.errors.length){
+              ctx.errorDialog(returned_mixtape);
+            }else{
+              ctx.storeMixtape(returned_mixtape);
+              ctx.redirect('#/mixtapes/' + returned_mixtape._id)
+            }
           }
         );
       });
