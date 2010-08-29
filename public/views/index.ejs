@@ -1,17 +1,29 @@
+<!-- sammy is butchering context.. this is is that passed object.. no way to call this.partial() !!! -->
 <div id="random" class="left">
 <h1>Random mixtapes</h1>
 <ul>
-  <% $.each(random_mixtapes, function(index, mixtape){ %>
-  <li><a href="#/mixtapes/<%= mixtape._id %>"><%= mixtape.theme %></a></li>
+  <% $.each(this.random_mixtapes, function(index, mixtape){ %>
+    <li>
+      <a href="#/mixtapes/<%= mixtape._id %>"><%= mixtape.theme %></a><br />
+      <%=mixtape.contributions.length %> songs
+      <% if (mixtape.contributions.length){ %>
+        listened to <%=mixtape.play_count %> <%=mixtape.play_count == 1 ? 'time' : 'times' %>.
+        <% var c = mixtape.contributions[mixtape.contributions.length - 1] %>
+        Last song added by <%= c.user %> who suggested <%= c.title %> by <%= c.artist %> 
+        <% if (c.comments){ %>
+          because <em>&quot;<%= c.comments %>&quot;</em>.
+        <% } %>
+      <% } %>
+    </li>
   <% }); %>
 </ul>
 </div>
 
 <div id="popular" class="right">
 <h1>Popular mixtapes</h1>
-<ul>
-  <% $.each(popular_mixtapes, function(index, mixtape){ %>
-  <li><a href="#/mixtapes/<%= mixtape._id %>"><%= mixtape.theme %></a></li>
+<ol>
+  <% $.each(this.popular_mixtapes, function(index, mixtape){ %>
+  <li><a href="#/mixtapes/<%= mixtape._id %>"><%= mixtape.theme %></a> with <%=mixtape.play_count%> plays.</li>
   <% }); %>
-</ul>
+</ol>
 </div>
