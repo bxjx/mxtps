@@ -26,33 +26,34 @@ body
       ul
         li
           a.button(href='#/mixtapes/new') Create a new mixtape
-    #player
-    .jp-playlist-player
-      .jp-interface
-        ul.jp-controls
-          li
-            a#jplayer_play.jp-play play
-          li
-            a#jplayer_pause.jp-pause pause
-          li
-            a#jplayer_stop.jp-stop stop
-          li
-            a#jplayer_volume_min.jp-volume-min min volume
-          li
-            a#jplayer_volume_max.jp-volume-max max volume
-          li
-            a#jplayer_previous.jp-previous previous
-          li
-            a#jplayer_next.jp-next next
-        .jp-progress
-          #jplayer_load_bar.jp-load-bar
-            #jplayer_play_bar.jp-play-bar
-        #jplayer_volume_bar.jp-volume-bar
-          #jplayer_volume_bar_value.jp-volume-bar-value
-        #jplayer_play_time.jp-play-time
-        #jplayer_total_time.jp-total-time
-      #jplayer_playlist.jp-playlist
-      #now-playing
+      .jp-playlist-player
+        .jp-interface
+          ul.jp-controls
+            li
+              a#jplayer_play.jp-play play
+            li
+              a#jplayer_pause.jp-pause pause
+            li
+              a#jplayer_stop.jp-stop stop
+            li
+              a#jplayer_volume_min.jp-volume-min min volume
+            li
+              a#jplayer_volume_max.jp-volume-max max volume
+            li
+              a#jplayer_previous.jp-previous previous
+            li
+              a#jplayer_next.jp-next next
+          .jp-progress
+            #jplayer_load_bar.jp-load-bar
+              #jplayer_play_bar.jp-play-bar
+          #jplayer_volume_bar.jp-volume-bar
+            #jplayer_volume_bar_value.jp-volume-bar-value
+          #jplayer_play_time.jp-play-time
+          #jplayer_total_time.jp-total-time
+        #jplayer_playlist.jp-playlist
+        #now-playing
+      br.clear
+      #player
     #content-container
       #content
         != body
