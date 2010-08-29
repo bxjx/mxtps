@@ -54,14 +54,14 @@
       },
 
       storeMixtape: function(mixtape){
-        if (this.app.storage.isAvailable()){
+        if (this.app.storage.isAvailable() && this.app.useStorage){
           this.app.storage.set(mixtape._id, mixtape)
         }
       },
 
       loadMixtape:  function(id, callback){
         var ctx = this;
-        if (ctx.app.storage.isAvailable() && ctx.app.storage.exists(id)){
+        if (ctx.app.storage.isAvailable()  && this.app.useStorage && ctx.app.storage.exists(id)){
           callback(ctx.app.storage.get(id));
         }else{
           $.getJSON('/mixtapes/' + id, function(mixtape){
@@ -205,6 +205,7 @@
     this.use(Helpers);
     this.use(Sammy.EJS);
     this.storage  = new Sammy.Store();
+    this.useStorage = false;
     this.subscription = null;
 
     this.bind('run', function(){

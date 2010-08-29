@@ -102,7 +102,7 @@ mongoose.model('Mixtape', {
             e.to = contribution;
             if (closedNow){
               e.save(function(){
-                var e = new MxtpsEvent()
+                var e2 = new MxtpsEvent()
                 e2.what = 'closed';
                 e2.when = saved_mixtape.closed_at;
                 e2.who = null
