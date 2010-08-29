@@ -189,6 +189,9 @@
         if (mixtape.errors.length){
           ctx.errorDialog(mixtape);
         }else{
+          if (ctx.params['user'].length) {
+            $.cookie('user', ctx.params['user']);
+          }
           ctx.storeMixtape(mixtape);
           ctx.redirect('#/mixtapes/' + mixtape._id)
         }
@@ -196,12 +199,12 @@
     });
 
     this.get('#/mixtapes/new', function(ctx){
-      ctx.partial('views/mixtapes/new.ejs');
+      ctx.partial('views/mixtapes/new.ejs', {user: $.cookie('user')});
     });
 
     this.get('#/mixtapes/:id/contributions/new', function(ctx){
       this.loadMixtape(this.params['id'], function(mixtape){
-        ctx.partial('views/contributions/new.ejs', {mixtape : mixtape});
+        ctx.partial('views/contributions/new.ejs', {mixtape : mixtape, user: $.cookie('user')});
       });
     });
 
