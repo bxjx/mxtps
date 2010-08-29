@@ -179,17 +179,20 @@
     this.post('#/mixtapes', function(ctx){
       ctx.postJSON('/mixtapes', {theme : ctx.params['theme']}, function(mixtape){
         ctx.storeMixtape(mixtape);
+        if (ctx.params['user'].length) {
+            $.cookie('user', ctx.params['user']);
+        }
         ctx.redirect('#/mixtapes/' + mixtape._id)
       });
     });
 
     this.get('#/mixtapes/new', function(ctx){
-      ctx.partial('views/mixtapes/new.ejs');
+      ctx.partial('views/mixtapes/new.ejs', {user: $.cookie('user')});
     });
 
     this.get('#/mixtapes/:id/contributions/new', function(ctx){
       this.loadMixtape(this.params['id'], function(mixtape){
-        ctx.partial('views/contributions/new.ejs', {mixtape : mixtape});
+        ctx.partial('views/contributions/new.ejs', {mixtape : mixtape, user: $.cookie('user')});
       });
     });
 
