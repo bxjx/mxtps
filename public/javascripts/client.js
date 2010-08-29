@@ -36,6 +36,10 @@
     this.items = items;
   };
 
+  Playlist.prototype.appendItem = function(item) {
+    this.items.push(item);
+  };
+
 
   var Helpers = function(app) {
     this.helpers({
@@ -73,6 +77,20 @@
           this.faye = new Faye.Client('/events');
         if (!this.subscription){
           this.subscription = this.faye.subscribe('/mixtapes/*', function(message) {
+            console.log("GOT :");
+            console.log(message);
+            if (message.mixtape){
+              ctx.storeMixtape(message.mixtape);
+              var path = '#/mixtape/' + message.mixtape._id;
+              if (ctx.path == path && message.what != 'created'){
+                // we're looking at this mixtape and there has been an update, let's reload the mixtape
+                this.swap(path);
+              }
+            }
+            if (message.what == 'mp3ok' && message.mixtape._id == ctx.currentMixtapeId){
+              console.log("appending... " + message.to.title);
+              ctx.playlist.appendItem(message.to);
+            }
             ctx.renderEvent(message);
           });
         }
@@ -103,6 +121,7 @@
           ctx.player.jPlayer("setFile", ctx.playlist.getCurrentUrl()).jPlayer('play');
           ctx.postJSON('/mixtapes/'+mixtape._id+'/played');
           ctx.renderCurrentMixtapeInfo(mixtape);
+          ctx.currentMixtapeId = mixtape._id;
         });
       },
 

@@ -6,17 +6,23 @@
   <% } %>
   <ol>
     <% $.each(mixtape.contributions, function(index, contribution){ %>
-      <li>
-        <span><%=contribution.title + " by " + contribution.artist%></span>
-        <p><%=contribution.comments%> &mdash; contribution.user.name</p>
+      <li class="contribution">
+        <strong class="song"><%=contribution.title + " by " + contribution.artist%></strong>
+        <span class="<%=contribution.status%>"><%=contribution.status == 'found' ? 'found!' : 'looking for mp3..'%></span>
+        <span class="quote">
+          <% if (contribution.comments){ %>
+          <em>&quot;<%=contribution.comments%>&quot;</em>
+          <% } %>
+          &mdash; <%=contribution.user%>
+        </span>
       </li>
     <% }) %>
   </ol>
 </div>
 
-<button id="play-mixtape">Play mixtape</button>
+<button id="play-mixtape">Play mixtape (more plays == more popular)</button>
 <% if (!mixtape.closed){ %>
 <a class="button" href="#/mixtapes/<%=mixtape._id%>/contributions/new">Suggest a song</a>
 <% }else{ %>
-<span>This has reached 10 songs and is now closed!</span>
+<span class="closed_message">This has reached 10 songs and is now closed!</span>
 <% } %>
