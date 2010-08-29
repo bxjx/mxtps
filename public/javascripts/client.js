@@ -34,13 +34,14 @@
       },
 
       storeMixtape: function(mixtape){
-        console.log("storing mixtape " + mixtape._id);
-        this.app.storage.set(mixtape._id, mixtape)
+        if (this.app.storage.isAvailable()){
+          this.app.storage.set(mixtape._id, mixtape)
+        }
       },
 
       loadMixtape:  function(id, callback){
         var ctx = this;
-        if (ctx.app.storage.exists(id)){
+        if (ctx.app.storage.isAvailable() && ctx.app.storage.exists(id)){
           callback(ctx.app.storage.get(id));
         }else{
           $.getJSON('/mixtapes/' + id, function(mixtape){
@@ -60,24 +61,6 @@
         this.subscription = this.faye.subscribe('/mixtapes/*', function(message) {
           ctx.renderEvent(message);
         });
-        //$.each(this.subscriptions, function(i, sub){ sub.cancel() });
-      },
-
-      subscribeToMixtape: function(mixtape){
-        /*
-        if (this.subscriptions.length > 10){
-          this.subscriptions.shift.cancel();
-        }
-        if (this.mainSubscription){
-          this.mainSubscription.cancel();
-        }
-        var ctx = this;
-        this.subscriptions.push(
-          this.faye.subscribe('/mixtapes/' + mixtape._id, function(message) {
-            ctx.renderEvent(message);
-          })
-        );
-        */
       },
 
       renderEvent : function(subEvent){
@@ -151,9 +134,9 @@
     });
 
     this.get('#/', function(ctx){
-      $.getJSON('/', function(res){
+      $.getJSON('/', function(mixtape_collections){
         ctx.subscribeAll();
-        ctx.partial('views/index.ejs', { random_mixtapes: res.random_mixtapes, popular_mixtapes: []});
+        ctx.partial('views/index.ejs', mixtape_collections);
       });
     });
 
@@ -178,7 +161,7 @@
       this.loadMixtape(this.params['id'], function(mixtape){
         ctx.postJSON(
           '/mixtapes/' + mixtape._id + '/contributions',
-          {artist: ctx.params['artist'], title: ctx.params['title'], comments: ctx.params['comments']},
+          {artist: ctx.params['artist'], title: ctx.params['title'], comments: ctx.params['comments'], url: ctx.params['url']},
           function(returned_mixtape){
             ctx.storeMixtape(returned_mixtape);
             ctx.redirect('#/mixtapes/' + returned_mixtape._id)
@@ -189,7 +172,6 @@
 
     this.get('#/mixtapes/:id', function(ctx){
       this.loadMixtape(this.params['id'], function(mixtape){
-        ctx.subscribeToMixtape(mixtape);
         ctx.partial('views/mixtapes/show.ejs', { mixtape: mixtape });
       });
     });

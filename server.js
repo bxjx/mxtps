@@ -7,7 +7,7 @@ var db = mongoose.connect(mongoUri);
 
 mongoose.model('Mixtape', {
   // need to validate uniquness of theme
-  properties: ['theme', 'slug', 'created_at', 'updated_at', 'id', {'contributions': []}, 'user'],
+  properties: ['theme', 'play_count', 'slug', 'created_at', 'updated_at', 'id', 'user', {'contributions': []}],
   //indexes: [[{ slug: 1 }, {unique: true}]],
   methods: {
     toJSON: function(){
@@ -54,14 +54,19 @@ mongoose.model('Mixtape', {
   static:  {
 
     random: function(fn){
-      this.find({}).sort([['updated_at', -1]]).limit(5).all(fn);
-    }
+      var direction = !Math.round(Math.random()) ? 1 : -1;
+      this.find({}).sort([['updated_at', direction]]).limit(5).all(fn);
+    }, 
+
+    popular: function(fn){
+      this.find({'play_count': {'$gt':1}}).sort([['play_count', -1]]).limit(10).all(fn);
+    },
   }
 });
 var Mixtape = db.model('Mixtape',db);
 
 mongoose.model('Contribution', {
-  properties: ['artist', 'title', 'comments', 'mixtape'],
+  properties: ['artist', 'title', 'comments', 'url'],
   methods: {
     toJSON: function(){
       return this._normalize();
@@ -114,7 +119,9 @@ app.get('/', function(req, res){
     res.render('index');
   }else{
     Mixtape.random(function(random_mixtapes){
-      res.send(JSON.stringify({random_mixtapes: random_mixtapes}));
+      Mixtape.popular(function(popular_mixtapes){
+        res.send(JSON.stringify({random_mixtapes: random_mixtapes, popular_mixtapes: popular_mixtapes}));
+      });
     });
   }
 });
@@ -135,6 +142,19 @@ app.post('/mixtapes/:id/contributions', function(req, res){
         res.send(JSON.stringify(mixtape));
       });
     });
+  });
+});
+
+app.post('/mixtapes/:id/played', function(req, res){
+  Mixtape.findById(req.params.id, function(mixtape){
+    if (mixtape){
+      mixtape.play_count += 1;
+      mixtape.save(function(){
+        res.send(JSON.stringify(mixtape));
+      });
+    }else{
+      res.send("Can't find mixtape with that id??", 404);
+    }
   });
 });
 
