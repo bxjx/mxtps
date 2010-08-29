@@ -1,6 +1,9 @@
 <h1 class="theme"><%= mixtape.theme %></h1>
 
 <div id="contributions" class="full">
+  <% if (!mixtape.contributions.length){ %>
+    No contributions yet. We'll update the page if someone adds a song.
+  <% } %>
   <ol>
     <% $.each(mixtape.contributions, function(index, contribution){ %>
       <li>
