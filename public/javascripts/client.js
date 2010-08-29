@@ -1,5 +1,32 @@
 (function($) {
 
+  function Playlist() {
+    this.index = 0;
+    this.items = [];
+  };
+  Playlist.prototype.next = function() {
+    if (this.index < this.items.length-1) {
+      this.index += 1;
+      return true;
+    }
+    return false;
+  };
+  Playlist.prototype.prev = function() {
+    if (this.index > 0 && this.items.length > 0) {
+      this.index -= 1;
+      return true;
+    }
+    return false;
+  };
+  Playlist.prototype.getCurrentUrl = function() {
+    return this.items[this.index] || "";
+  };
+  Playlist.prototype.setItems = function(items) {
+    this.index = 0;
+    this.items = items;
+  };
+
+
   var Helpers = function(app) {
     this.helpers({
       postJSON: function(url, data, success){
@@ -57,6 +84,48 @@
         this.partial('views/events/show.ejs', {subEvent: subEvent}, function(rendered) {
           $('#events').prepend(rendered).children(':first').hide().fadeIn(2000);
         });
+      },
+
+      initPlayer : function(){
+        var ctx = this;
+        ctx.player = $("#player");
+        ctx.playlist = new Playlist();
+        ctx.player.jPlayer({
+          swfPath: '/javascripts/lib/jplayer',
+          volume: 50,
+          ready: function(){
+            this.element.jPlayer('setFile', ctx.playlist.getCurrentUrl());
+          }
+        }).jPlayer('onSoundComplete', function(){
+          if (ctx.playlist.next()) {
+            this.element.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
+          }
+          // TODO: set "now playing" track name?
+        });
+
+        $('#play-mixtape').live('click', function(){
+          // TODO: pull in actual mixtape urls, title, etc.
+          ctx.playlist.setItems([
+            "http://butterteam.com/05 Negative_Thinking.mp3",
+            "http://a1926.g.akamai.net/downloadstor.download.akamai.com/mtv.com/downloads/mp3/a/arcade_fire/arcade_fire_rebellion.mp3"
+          ]);
+          // TODO: set "now playing" to mixtape title.
+          ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
+        });
+
+        $('.jp-next').live('click', function(){
+          if (ctx.playlist.next()) {
+            ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
+          }
+          // TODO: set "now playing" track name?
+        });
+
+        $('.jp-previous').live('click', function(){
+          if (ctx.playlist.prev()) {
+            ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
+          }
+          // TODO: set "now playing" track name?
+        });
       }
     });
   };
@@ -69,11 +138,13 @@
     this.use(Sammy.EJS);
     this.storage  = new Sammy.Store();
 
-    /*
+    this.bind('run', function(){
+      this.initPlayer();
+    });
+
     this.bind('changed', function(){
       $('input, textarea').filter(':first').focus();
     });
-    */
 
     this.before(function() {
       this.startFaye();
@@ -126,17 +197,6 @@
 
 
   $(function() {
-    /*$('#player').jPlayer({
-      swfPath: '/javascripts/lib/jplayer',
-      ready: function(){
-        this.element.jPlayer('setFile', 'http://butterteam.com/05 Negative_Thinking.mp3').jPlayer('play');
-      },
-      volume: 50
-    })
-    .jPlayer('onSoundComplete', function(){
-      this.element.jPlayer('play');
-    });*/
-
     app.run('#/');
   });
 
