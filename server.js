@@ -5,6 +5,36 @@ var mongoUri = process.env.MONGO_URI || 'mongodb://localhost/mixtapes';
 var mongoose = require('./lib/mongoose/mongoose').Mongoose;
 var db = mongoose.connect(mongoUri);
 
+mongoose.model('MxtpsEvent', {
+  properties: ['what', 'when', 'who', 'to', 'mixtape_id', 'mixtape'],
+  methods: {
+    toJSON: function(){
+      return this._normalize();
+    },
+    save: function(fn){
+      if (this.isNew){
+        if (!this.when)
+          this.when = new Date();
+        if (!this.mixtape_id)
+          this.mixtape_id = this.mixtape._id;
+        //console.info('sending off ' + JSON.stringify(this.toObject()) + ' to ' +  '/mixtapes/' + this.mixtape.id());
+        bayeux.getClient().publish('/mixtapes/' + this.mixtape.id(), this.toObject());
+      }
+      this.__super__(fn);
+    }
+  },
+  static: {
+    recent: function(fn){
+      this.find({}).sort([['when', -1]]).limit(10).all(fn);
+    },
+
+    forMixtape: function(mixtape, fn){
+      this.find({'mixtape_id': mixtape._id}).sort([['when', -1]]).limit(10).all(fn);
+    },
+  }
+});
+var MxtpsEvent = db.model('MxtpsEvent',db);
+
 mongoose.model('Mixtape', {
   // need to validate uniquness of theme
   properties: ['theme', 'play_count', 'slug', 'created_at', 'updated_at', 'id', 'user', {'contributions': []}],
@@ -27,21 +57,24 @@ mongoose.model('Mixtape', {
       if (this.isNew){
         this.created_at = new Date();
         after_save = function(){
-          bayeux.getClient().publish(
-            '/mixtapes/' + saved_mixtape.id(),
-            {what: 'created', when: saved_mixtape.created_at, who: saved_mixtape.user || 'anon', mixtape: saved_mixtape.toObject()}
-          );
-          fn();
-        }
+          var e = new MxtpsEvent()
+          e.what = 'created';
+          e.when = saved_mixtape.created_at;
+          e.who = saved_mixtape.user || 'anon'
+          e.mixtape = saved_mixtape;
+          e.save(fn);
+        };
       }else{
         if (this._dirty['contributions']){
           contribution = this.contributions[this.contributions.length - 1];
           after_save = function(){
-            bayeux.getClient().publish(
-              '/mixtapes/' + saved_mixtape.id(),
-              {what: 'contribution', when: contribution.created_at || new Date(), who: contribution.user, mixtape: saved_mixtape.toObject(), to: contribution.toObject()}
-            );
-            fn();
+            var e = new MxtpsEvent()
+            e.what = 'contribution';
+            e.when = contribution.created_at;
+            e.who = contribution.user || 'anon'
+            e.mixtape = saved_mixtape;
+            e.to = contribution;
+            e.save(fn);
           }
         }else{
           after_save = fn;
@@ -126,6 +159,12 @@ app.get('/', function(req, res){
   }
 });
 
+app.get('/recent_events', function(req, res){
+  MxtpsEvent.recent(function(events){
+    res.send(JSON.stringify(events));
+  });
+});
+
 app.post('/mixtapes', function(req, res){
   var mixtape = new Mixtape(req.body);
   mixtape.save(function(){
@@ -141,6 +180,14 @@ app.post('/mixtapes/:id/contributions', function(req, res){
       mixtape.save(function(){
         res.send(JSON.stringify(mixtape));
       });
+    });
+  });
+});
+
+app.get('/mixtapes/:id/recent_events', function(req, res){
+  Mixtape.findById(req.params.id, function(mixtape){
+    MxtpsEvent.forMixtape(mixtape, function(events){
+      res.send(JSON.stringify(events));
     });
   });
 });

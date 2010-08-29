@@ -1,5 +1,5 @@
-<div>
-  At <%=subEvent.when%>, <%=subEvent.who%>
+<div class="event">
+  <abbr class="timeago" title="<%=subEvent.when%>"><%=subEvent.when%></abbr>, <%=subEvent.who%>
   <% if (subEvent.what == 'created'){%>
     created a new mixtape called
     <a href="#/mixtapes/<%=subEvent.mixtape._id%>"><%=subEvent.mixtape.theme%></a>.

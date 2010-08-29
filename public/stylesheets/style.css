@@ -261,3 +261,7 @@ h1.theme {
 #activity{
   margin-left:20px;
 }
+
+#popular ol{
+  list-style: decimal inside;
+}
