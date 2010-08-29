@@ -193,6 +193,41 @@ var app = express.createServer(
 
 app.set('view engine', 'jade');
 
+
+var http = require('http');
+var querystring = require('querystring');
+function lookForMp3(mixtape, contribution){
+  var host = 'skreemr.org';
+  var url = '/advanced_results.jsp?advanced=true&';
+  url += querystring.stringify({song: contribution.title, artist: contribution.artist})
+  url += '&album=&genre=&bitrate=0&length=';
+  var server = http.createClient(80, host);
+  console.log(url);
+  var request = server.request('GET', url, { Host: host,
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Keep-Alive': '115',
+      'Connection': 'keep-alive',
+      'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+      'Accept-Language': 'en-us,en;q=0.5',
+      });
+  request.end();
+  request.on('response', function (response) {
+    response.setEncoding('utf8');
+    var body = "";
+    response.on('data', function (data) { body += data; });
+    response.on('end', function () {
+      var match = body.match(/soundFile=(.*)'/);
+      if (match){
+        var mp3Url = querystring.unescape(match[1]);
+        contribution.url = mp3Url;
+        contribution.save(function(){
+          console.log('saved! with ' + mp3Url);
+        });
+      }
+    });
+  });
+}
+
 app.get('/', function(req, res){
   if (!req.xhr){
     res.render('index');
@@ -203,6 +238,13 @@ app.get('/', function(req, res){
       });
     });
   }
+});
+
+app.get('/find_prince', function(req, res){
+  contribution = new Contribution();
+  contribution.title = 'Cream';
+  contribution.artist = 'Prince';
+  lookForMp3(null, contribution);
 });
 
 app.get('/recent_events', function(req, res){
@@ -231,6 +273,7 @@ app.post('/mixtapes/:id/contributions', function(req, res){
         contribution.save(function(){
           mixtape.save(function(){
             res.send(JSON.stringify(mixtape));
+            lookForMp3(mixtape, contribution);
           });
         });
       }else{
