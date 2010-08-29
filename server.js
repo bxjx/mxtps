@@ -220,11 +220,11 @@ app.set('view engine', 'jade');
 
 var http = require('http');
 var querystring = require('querystring');
+
 function lookForMp3(mixtape, contribution){
-  var host = 'skreemr.org';
-  var url = '/advanced_results.jsp?advanced=true&';
-  url += querystring.stringify({song: contribution.title, artist: contribution.artist})
-  url += '&album=&genre=&bitrate=0&length=';
+  var host = 'musicmp3.ru';
+  var url = '/search.html?';
+  url += querystring.stringify({text: contribution.title + " " + contribution.artist})
   var server = http.createClient(80, host);
   console.log(url);
   var request = server.request('GET', url, { Host: host,
@@ -240,9 +240,11 @@ function lookForMp3(mixtape, contribution){
     var body = "";
     response.on('data', function (data) { body += data; });
     response.on('end', function () {
-      var match = body.match(/soundFile=(.*)'/);
+      puts 
+      var match = body.match(/Play\(this,'(http:.*?lofi.mp3)'/);
       if (match){
-        var mp3Url = querystring.unescape(match[1]);
+        var mp3Url = match[1];
+        console.info("found " + mp3Url);
         contribution.url = mp3Url;
         contribution.url_status = 200;
         contribution.status = 'found';
