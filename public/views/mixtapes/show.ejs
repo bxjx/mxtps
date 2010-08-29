@@ -11,5 +11,9 @@
   </ol>
 </div>
 
-<a class="button" href="#/mixtapes/<%=mixtape._id%>/contributions/new">Suggest a song</a>
 <button id="play-mixtape">Play mixtape</button>
+<% if (!mixtape.closed){ %>
+<a class="button" href="#/mixtapes/<%=mixtape._id%>/contributions/new">Suggest a song</a>
+<% }else{ %>
+<span>This has reached 10 songs and is now closed!</span>
+<% } %>

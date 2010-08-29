@@ -1,6 +1,8 @@
 var port = parseInt(process.env.PORT) || 3000;
 var mongoUri = process.env.MONGO_URI || 'mongodb://localhost/mixtapes';
 
+var _ = require('./public/javascripts/lib/underscore-min')._;
+
 // models
 var mongoose = require('./lib/mongoose/mongoose').Mongoose;
 var db = mongoose.connect(mongoUri);
@@ -36,15 +38,29 @@ mongoose.model('MxtpsEvent', {
 var MxtpsEvent = db.model('MxtpsEvent',db);
 
 mongoose.model('Mixtape', {
-  // need to validate uniquness of theme
-  properties: ['theme', 'play_count', 'slug', 'created_at', 'updated_at', 'id', 'user', {'contributions': []}],
+  properties: ['theme', 'play_count', 'slug', 'created_at', 'updated_at', 'id', 'user', 'closed', {'contributions': []}],
   //indexes: [[{ slug: 1 }, {unique: true}]],
   methods: {
     toJSON: function(){
-      return this._normalize();
+      var o = this._normalize();
+      o['errors'] = this.errors || [];
+      return o;
     },
     id: function(){
       return this._id.toHexString();
+    },
+    valid : function(){
+      this.errors = [];
+      var mixtape = this;
+      _.each(['theme', 'user'], function(attr){
+        if (!mixtape[attr] || !mixtape[attr].trim().length){
+          mixtape.errors.push(attr + " is blank");
+        }
+      });
+      if (this.closed){
+        this.errors.push("This mixtape has been closed!");
+      }
+      return this.errors.length == 0;
     },
     addContribution: function(contribution){
       this._dirty['contributions'] = true;
@@ -54,6 +70,7 @@ mongoose.model('Mixtape', {
       var after_save;
       var saved_mixtape = this;
       var contribution;
+      var closedNow = false;
       if (this.isNew){
         this.created_at = new Date();
         after_save = function(){
@@ -67,6 +84,11 @@ mongoose.model('Mixtape', {
       }else{
         if (this._dirty['contributions']){
           contribution = this.contributions[this.contributions.length - 1];
+          if (saved_mixtape.contributions.length >= 10 && !this.closed){
+            this.closed = true;
+            this.closed_at = new Date();
+            closedNow = true;
+          }
           after_save = function(){
             var e = new MxtpsEvent()
             e.what = 'contribution';
@@ -74,7 +96,18 @@ mongoose.model('Mixtape', {
             e.who = contribution.user || 'anon'
             e.mixtape = saved_mixtape;
             e.to = contribution;
-            e.save(fn);
+            if (closedNow){
+              e.save(function(){
+                var e = new MxtpsEvent()
+                e2.what = 'closed';
+                e2.when = saved_mixtape.closed_at;
+                e2.who = null
+                e2.mixtape = saved_mixtape;
+                e2.save(fn);
+              });
+            }else{
+              e.save(fn);
+            }
           }
         }else{
           after_save = fn;
@@ -99,10 +132,23 @@ mongoose.model('Mixtape', {
 var Mixtape = db.model('Mixtape',db);
 
 mongoose.model('Contribution', {
-  properties: ['artist', 'title', 'comments', 'url'],
+  properties: ['artist', 'title', 'comments', 'url', 'user'],
   methods: {
     toJSON: function(){
-      return this._normalize();
+      var o = this._normalize();
+      if (this.errors)
+        o['errors'] = this.errors;
+      return o;
+    },
+    valid : function(){
+      this.errors = [];
+      var contribution = this;
+      _.each(['artist', 'title', 'user'], function(attr){
+        if (!contribution[attr] || !contribution[attr].trim().length){
+          contribution.errors.push(attr + " is blank");
+        }
+      });
+      return this.errors.length == 0;
     },
     id: function(){
       return this._id.toHexString();
@@ -167,20 +213,32 @@ app.get('/recent_events', function(req, res){
 
 app.post('/mixtapes', function(req, res){
   var mixtape = new Mixtape(req.body);
-  mixtape.save(function(){
+  if (mixtape.valid()){
+    mixtape.save(function(){
+      res.send(JSON.stringify(mixtape));
+    });
+  }else{
     res.send(JSON.stringify(mixtape));
-  });
+  }
 });
 
 app.post('/mixtapes/:id/contributions', function(req, res){
   Mixtape.findById(req.params.id, function(mixtape){
     var contribution = new Contribution(req.body)
-    contribution.save(function(){
-      mixtape.addContribution(contribution);
-      mixtape.save(function(){
+    mixtape.addContribution(contribution);
+    if (contribution.valid()){
+      if (mixtape.valid()){
+        contribution.save(function(){
+          mixtape.save(function(){
+            res.send(JSON.stringify(mixtape));
+          });
+        });
+      }else{
         res.send(JSON.stringify(mixtape));
-      });
-    });
+      }
+    }else{
+      res.send(JSON.stringify(contribution));
+    }
   });
 });
 

@@ -21,8 +21,8 @@
   <label for="f_comments">We'll try to find this song for you on the internets.. but if you know the mp3 or ogg url, put it in here:</label>
   <input type='text' name='url' id="f_url" />
   </div>
-  <ul>
-    <!-- li><a class="button" href="#/mixtapes/<%= mixtape.id %>">Cancel</a></li -->
-    <li><input type='submit' value='Add my song' /></li>
-  <ul>
+  <div>
+    <input type='submit' value='Add my song' />
+    <a class="button" href="#/mixtapes/<%= mixtape._id %>">Nah... forget it</a>
+  </div>
 </form>
