@@ -81,7 +81,7 @@
             console.log(message);
             if (message.mixtape){
               ctx.storeMixtape(message.mixtape);
-              var path = '#/mixtape/' + message.mixtape._id;
+              var path = '#/mixtapes/' + message.mixtape._id;
               if (ctx.path == path && message.what != 'created'){
                 // we're looking at this mixtape and there has been an update, let's reload the mixtape
                 this.swap(path);
