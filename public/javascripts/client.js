@@ -87,6 +87,7 @@
                 this.swap(path);
               }
             }
+            console.info("comparing" + message.mixtape._id + " and " + ctx.currentMixtapeId);
             if (message.what == 'mp3ok' && message.mixtape._id == ctx.currentMixtapeId){
               console.log("appending... " + message.to.title);
               ctx.playlist.appendItem(message.to);
