@@ -57,13 +57,10 @@
         }
       },
 
-      startFaye: function(){
-        this.faye = new Faye.Client('/events');
-        this.subscription = null; 
-      },
-
       subscribeAll: function(){
         var ctx = this;
+        if (!this.faye)
+          this.faye = new Faye.Client('/events');
         if (!this.subscription){
           this.subscription = this.faye.subscribe('/mixtapes/*', function(message) {
             ctx.renderEvent(message);
@@ -163,18 +160,15 @@
     this.use(Helpers);
     this.use(Sammy.EJS);
     this.storage  = new Sammy.Store();
+    this.subscription = null;
 
     this.bind('run', function(){
       this.initPlayer();
+      this.subscribeAll();
     });
 
     this.bind('changed', function(){
       $('input, textarea').filter(':first').focus();
-    });
-
-    this.before(function() {
-      this.startFaye();
-      this.subscribeAll();
     });
 
     this.get('#/', function(ctx){
