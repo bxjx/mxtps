@@ -18,9 +18,19 @@
     }
     return false;
   };
+  Playlist.prototype.current = function() {
+    return this.items[this.index];
+  }
   Playlist.prototype.getCurrentUrl = function() {
-    return this.items[this.index] || "";
+    if (this.current()) {
+      return this.items[this.index].url;
+    }
   };
+  Playlist.prototype.getCurrentTitle = function() {
+    if (this.current()) {
+      return this.items[this.index].title;
+    }
+  }
   Playlist.prototype.setItems = function(items) {
     this.index = 0;
     this.items = items;
@@ -69,16 +79,40 @@
         });
       },
 
+      renderCurrentTrackInfo : function() {
+        $("#current-track").text(this.playlist.getCurrentTitle());
+      },
+
+      renderCurrentMixtapeInfo : function(mixtape) {
+        var ctx = this;
+        ctx.partial('views/player/nowplaying.ejs', {mixtape: mixtape, playlist: ctx.playlist}, function (rendered) {
+          $("#now-playing").html(rendered);
+          ctx.renderCurrentTrackInfo();
+        });
+      },
+
       playMixtape : function(id) {
         var ctx = this;
         this.loadMixtape(id, function(mixtape){
-          var items = $.map(mixtape.contributions, function(contribution){
-            return contribution.url;
-          });
-          ctx.playlist.setItems(items);
+          ctx.playlist.setItems(mixtape.contributions);
           ctx.player.jPlayer("setFile", ctx.playlist.getCurrentUrl()).jPlayer('play');
           ctx.postJSON('/mixtapes/'+mixtape._id+'/played');
+          ctx.renderCurrentMixtapeInfo(mixtape);
         });
+      },
+
+      gotoNextTrack : function() {
+        if (this.playlist.next()) {
+          this.player.jPlayer('setFile', this.playlist.getCurrentUrl()).jPlayer('play');
+        }
+        this.renderCurrentTrackInfo();
+      },
+
+      gotoPrevTrack : function() {
+        if (this.playlist.prev()) {
+          this.player.jPlayer('setFile', this.playlist.getCurrentUrl()).jPlayer('play');
+        }
+        this.renderCurrentTrackInfo();
       },
 
       initPlayer : function(){
@@ -92,31 +126,22 @@
             this.element.jPlayer('setFile', ctx.playlist.getCurrentUrl());
           }
         }).jPlayer('onSoundComplete', function(){
-          if (ctx.playlist.next()) {
-            ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
-          }
-          // TODO: set "now playing" track name
+          ctx.gotoNextTrack();
         });
 
         $('#play-mixtape').live('click', function(){
-          var currentMixtapeId = window.location.hash.replace(/^#\/mixtapes\/([0-9a-f]+)$/, '$1');
+          var currentMixtapeId = location.hash.replace(/^#\/mixtapes\/([0-9a-f]+)$/, '$1');
           ctx.playMixtape(currentMixtapeId);
         });
 
         $('.jp-next').live('click', function(){
-          if (ctx.playlist.next()) {
-            ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
-          }
+          ctx.gotoNextTrack();
           $(this).blur();
-          // TODO: set "now playing" track name
         });
 
         $('.jp-previous').live('click', function(){
-          if (ctx.playlist.prev()) {
-            ctx.player.jPlayer('setFile', ctx.playlist.getCurrentUrl()).jPlayer('play');
-          }
+          ctx.gotoPrevTrack();
           $(this).blur();
-          // TODO: set "now playing" track name
         });
       },
 
