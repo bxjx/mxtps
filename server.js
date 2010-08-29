@@ -2,7 +2,7 @@ var port = parseInt(process.env.PORT) || 3000;
 var mongoUri = process.env.MONGO_URI || 'mongodb://localhost/mixtapes';
 
 var http = require('http');
-var url = require('url');
+var URL = require('url');
 var _ = require('./public/javascripts/lib/underscore-min')._;
 
 // models
@@ -133,6 +133,25 @@ mongoose.model('Mixtape', {
 });
 var Mixtape = db.model('Mixtape',db);
 
+function check_url_status(url, cb) {
+  var u = URL.parse(url);
+  var client = http.createClient(u.port || 80, u.hostname);
+  var request = client.request('HEAD', u.pathname+u.search, {'host':u.hostname});
+  request.end();
+  request.on('response', function (response){
+    console.info(JSON.stringify(response.headers));
+    if (response.headers.location) {
+      console.info("redirected!  checking " + response.headers.location);
+      // TODO: response.headers.location string contains the url plus "undefined"
+      // assume 200 for now
+      // check_url_status(response.headers.location, cb);
+      cb(200);
+    } else {
+      cb(response.statusCode);
+    }
+  });
+};
+
 mongoose.model('Contribution', {
   properties: ['artist', 'title', 'comments', 'url', 'user', 'url_status'],
   methods: {
@@ -156,30 +175,23 @@ mongoose.model('Contribution', {
       return this._id.toHexString();
     },
     save: function(fn){
-      if (this.isNew && /^http/.test(this.url)) {
-
-        console.info("new contribution; checking url: " + this.url);
-
-        var u = url.parse(this.url);
-        var client = http.createClient(u.port || 80, u.hostname);
-        var request = client.request('HEAD', u.pathname + u.search, {'host': u.hostname});
-        request.end();
-
-        var that = this;
-        request.on('response', function tcb(response) {
-          if ([301, 302, 307].indexOf(response.statusCode) != -1) {
-            // TODO: handle redirects
-            console.info("url check complete: " + contribution.url + " is HTTP " + contribution.url_status);
-          } else {
+      var after_save;
+      var that = this;
+      if (!this.url_status && /^http/.test(that.url)) {
+        after_save = function(){
+          console.info("new contribution; checking url: " + that.url);
+          check_url_status(that.url, function(statusCode){
             Contribution.findById(that._id, function(contribution){
-              contribution.url_status = response.statusCode;
+              contribution.url_status = statusCode;
               console.info("url check complete: " + contribution.url + " is HTTP " + contribution.url_status);
-              contribution.save();
+              contribution.save(fn);
             });
-          }
-        });
+          });
+        };
+      } else {
+        after_save = fn;
       }
-      this.__super__(fn);
+      this.__super__(after_save);
     }
   }
 });
