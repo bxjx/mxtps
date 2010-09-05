@@ -54,14 +54,14 @@
       },
 
       storeMixtape: function(mixtape){
-        if (this.app.storage.isAvailable() && this.app.useStorage){
+        if (this.app.useStorage && this.app.storage.isAvailable()){
           this.app.storage.set(mixtape._id, mixtape)
         }
       },
 
       loadMixtape:  function(id, callback){
         var ctx = this;
-        if (ctx.app.storage.isAvailable()  && this.app.useStorage && ctx.app.storage.exists(id)){
+        if (this.app.useStorage && ctx.app.storage.isAvailable() && ctx.app.storage.exists(id)){
           callback(ctx.app.storage.get(id));
         }else{
           $.getJSON('/mixtapes/' + id, function(mixtape){
@@ -77,8 +77,6 @@
           this.faye = new Faye.Client('/events');
         if (!this.subscription){
           this.subscription = this.faye.subscribe('/mixtapes/*', function(message) {
-            console.log("GOT :");
-            console.log(message);
             if (message.mixtape){
               ctx.storeMixtape(message.mixtape);
               var path = '#/mixtapes/' + message.mixtape._id;
@@ -87,9 +85,7 @@
                 this.swap(path);
               }
             }
-            console.info("comparing" + message.mixtape._id + " and " + ctx.currentMixtapeId);
             if (message.what == 'mp3ok' && message.mixtape._id == ctx.currentMixtapeId){
-              console.log("appending... " + message.to.title);
               ctx.playlist.appendItem(message.to);
             }
             ctx.renderEvent(message);
@@ -98,7 +94,7 @@
       },
 
       renderEvent : function(subEvent){
-        this.partial('views/events/show.ejs', {subEvent: subEvent}, function(rendered) {
+        this.render('views/events/show.ejs', {subEvent: subEvent, ctx : this}, function(rendered) {
           $('#events').prepend(rendered).children(':first').hide().fadeIn(2000);
         });
       },
@@ -218,8 +214,9 @@
     });
 
     this.get('#/', function(ctx){
-      $.getJSON('/', function(mixtape_collections){
-        ctx.partial('views/index.ejs', mixtape_collections);
+      $.getJSON('/', function(data){
+        data['ctx'] = ctx;
+        ctx.partial('views/index.ejs', data);
         ctx.addRecentEvents();
       });
     });
@@ -267,7 +264,9 @@
 
     this.get('#/mixtapes/:id', function(ctx){
       this.loadMixtape(this.params['id'], function(mixtape){
-        ctx.partial('views/mixtapes/show.ejs', { mixtape: mixtape });
+        console.log(mixtape);
+        ctx.partial('views/mixtapes/show.ejs', { mixtape: mixtape, ctx : ctx});
+        console.log("post partial");
         ctx.addRecentEventsForMixtape(mixtape);
       });
     });

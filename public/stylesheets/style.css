@@ -292,3 +292,7 @@ h1.theme {
 #current-track {
   font-style: italic;
 }
+
+h1 span#by{
+  color: #999999;
+}

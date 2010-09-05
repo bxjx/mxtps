@@ -1,4 +1,5 @@
-<h1 class="theme"><%= mixtape.theme %></h1>
+<% var h = ctx.h %>
+<h1 class="theme"><%=h(mixtape.theme) %> <span id="by">by</span> <span id="user"><%=h(mixtape.user)%></span></h1>
 
 <div id="contributions" class="full">
   <% if (!mixtape.contributions.length){ %>
@@ -7,13 +8,13 @@
   <ol>
     <% $.each(mixtape.contributions, function(index, contribution){ %>
       <li class="contribution">
-        <strong class="song"><%=contribution.title + " by " + contribution.artist%></strong>
+        <strong class="song"><%=h(contribution.title) + " by " + h(contribution.artist)%></strong>
         <span class="<%=contribution.status%>"><%=contribution.status == 'found' ? 'found!' : 'looking for mp3..'%></span>
         <span class="quote">
           <% if (contribution.comments){ %>
-          <em>&quot;<%=contribution.comments%>&quot;</em>
+          <em>&quot;<%=h(contribution.comments)%>&quot;</em>
           <% } %>
-          &mdash; <%=contribution.user%>
+          &mdash; <%=h(contribution.user)%>
         </span>
       </li>
     <% }) %>
