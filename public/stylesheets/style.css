@@ -296,3 +296,7 @@ h1.theme {
 h1 span#by{
   color: #999999;
 }
+
+#tplayer{
+  margin-left: -1000px;
+}

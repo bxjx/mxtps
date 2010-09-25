@@ -22,6 +22,7 @@
     return this.items[this.index];
   }
   Playlist.prototype.getCurrentUrl = function() {
+    return 'NKhvFcB-dWU';
     if (this.current()) {
       return this.items[this.index].url;
     }
@@ -113,6 +114,8 @@
 
       playMixtape : function(id) {
         var ctx = this;
+        //var tplayer = document.getElementById("tplayer");
+        //tplayer.loadVideoById('NKhvFcB-dWU');
         this.loadMixtape(id, function(mixtape){
           ctx.playlist.setItems(mixtape.contributions);
           ctx.player.jPlayer("setFile", ctx.playlist.getCurrentUrl()).jPlayer('play');
@@ -277,6 +280,12 @@
     $("abbr.timeago").livequery(function(){
       $(this).timeago();
     });
+
+    //swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=player",
+    // "player", "425", "1", "8", null, null, 
+    // {allowScriptAccess: "always"}, {id: 'tplayer'}
+    //);
+
     app.run('#/');
   });
 

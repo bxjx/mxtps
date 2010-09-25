@@ -1,3 +1,7 @@
+var devKey = parseInt(process.env.DEV_KEY) || 'AI39si5k6vmiNLn_o31oObjaRzwruZvbs_lQJVO5xQnKnnW5LtsiH4873p4KgeRX68xZ1uSBYe18Ew-6FtqQzuXbZS-fRhkWNQ';
+if (!devKey){
+  throw("Could not find dev key");
+}
 var http = require('http');
 var querystring = require('querystring');
 
@@ -8,7 +12,10 @@ exports.checkUrlStatus = function(url, cb) {
   return cb(200);
   var u = URL.parse(url);
   var client = http.createClient(u.port || 80, u.hostname);
-  var request = client.request('HEAD', u.pathname+u.search, {'Host':u.hostname});
+  var request = client.request('HEAD', u.pathname+u.search, {
+    'Host': u.hostname,
+    'X-GData-Key': 'key=' + devKey,
+  });
   request.end();
   request.on('response', function (response){
     console.info(JSON.stringify(response.headers));
@@ -24,10 +31,29 @@ exports.checkUrlStatus = function(url, cb) {
   });
 };
 
+exports.forThisContributionOnYoutube = function(mixtape, contribution){
+  var host = 'gdata.youtube.com';
+  var url = '/feeds/api/videos?max-results=1&alt=json&';
+  url += querystring.stringify({q: contribution.title + " " + contribution.artist});
+  console.log(url);
+  var server = http.createClient(80, host);
+  var request = server.request('GET', url, { Host: host });
+  request.end();
+  request.on('response', function (response) {
+    response.setEncoding('utf8');
+    var body = "";
+    response.on('data', function (data) { body += data; });
+    response.on('end', function () {
+      var results = JSON.parse(body);
+      console.log(JSON.stringify(results['feed']['entry'][0]['link'][0]['href']));
+    });
+  });
+};
+
 exports.forThisContribution = function(mixtape, contribution){
   var host = 'musicmp3.ru';
   var url = '/search.html?';
-  url += querystring.stringify({text: contribution.title + " " + contribution.artist})
+  url += querystring.stringify({text: contribution.title + " " + contribution.artist});
   var server = http.createClient(80, host);
   console.log(url);
   var request = server.request('GET', url, { Host: host,
@@ -43,7 +69,6 @@ exports.forThisContribution = function(mixtape, contribution){
     var body = "";
     response.on('data', function (data) { body += data; });
     response.on('end', function () {
-      puts 
       var match = body.match(/Play\(this,'(http:.*?lofi.mp3)'/);
       if (match){
         var mp3Url = match[1];
@@ -57,5 +82,5 @@ exports.forThisContribution = function(mixtape, contribution){
       }
     });
   });
-}
+};
 

@@ -3,6 +3,7 @@ var port = parseInt(process.env.PORT) || 3000;
 var http = require('http');
 var URL = require('url');
 var _ = require('./public/javascripts/lib/underscore-min')._;
+require.paths.unshift('./vendor');
 
 var models = require('./models');
 var Mixtape = models.Mixtape;
@@ -41,7 +42,7 @@ app.get('/find_prince', function(req, res){
   contribution = new Contribution();
   contribution.title = 'Cream';
   contribution.artist = 'Prince';
-  findmp3s.forThisContribution(null, contribution);
+  findmp3s.forThisContributionOnYoutube(null, contribution);
 });
 
 app.get('/recent_events', function(req, res){
