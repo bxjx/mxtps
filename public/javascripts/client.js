@@ -23,7 +23,7 @@ var _gaq = _gaq || [];
     return this.items[this.index];
   };
   Playlist.prototype.getCurrentUrl = function() {
-    return 'NKhvFcB-dWU';
+    //return 'NKhvFcB-dWU';
     if (this.current()) {
       return this.items[this.index].url;
     }
@@ -109,7 +109,7 @@ var _gaq = _gaq || [];
 
       renderCurrentMixtapeInfo : function(mixtape) {
         var ctx = this;
-        ctx.partial('views/player/nowplaying.ejs', {mixtape: mixtape, playlist: ctx.playlist}, function (rendered) {
+        ctx.render('views/player/nowplaying.ejs', {mixtape: mixtape, playlist: ctx.playlist}, function (rendered) {
           $("#now-playing").html(rendered);
           ctx.renderCurrentTrackInfo();
         });
