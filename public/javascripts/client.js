@@ -117,8 +117,9 @@ var _gaq = _gaq || [];
 
       playMixtape : function(id) {
         var ctx = this;
-        //var tplayer = document.getElementById("tplayer");
-        //tplayer.loadVideoById('NKhvFcB-dWU');
+        var tplayer = document.getElementById("tplayer");
+        tplayer.loadVideoById('NKhvFcB-dWU');
+        return true;
         this.loadMixtape(id, function(mixtape){
           ctx.playlist.setItems(mixtape.contributions);
           ctx.player.jPlayer("setFile", ctx.playlist.getCurrentUrl()).jPlayer('play');
@@ -297,10 +298,10 @@ var _gaq = _gaq || [];
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();
 
-    //swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=player",
-    // "player", "425", "1", "8", null, null, 
-    // {allowScriptAccess: "always"}, {id: 'tplayer'}
-    //);
+    swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=player",
+      "player", "425", "1", "8", null, null, 
+      {allowScriptAccess: "always"}, {id: 'tplayer'}
+      );
 
     app.run('#/');
   });

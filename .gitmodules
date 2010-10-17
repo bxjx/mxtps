@@ -1,3 +1,6 @@
 [submodule "lib/mongoose"]
 	path = lib/mongoose
 	url = git://github.com/LearnBoost/mongoose.git
+[submodule "public/javascripts/lib/jPlayer"]
+	path = public/javascripts/lib/jPlayer
+	url = git@github.com:bxjx/jPlayer.git
