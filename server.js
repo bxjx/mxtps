@@ -2,6 +2,10 @@ var port = parseInt(process.env.PORT) || 3000;
 
 var http = require('http');
 var URL = require('url');
+var path = require('path');
+
+process.chdir(path.dirname(process.argv[1]));
+
 var _ = require('./public/javascripts/lib/underscore-min')._;
 require.paths.unshift('./vendor');
 
