@@ -23,7 +23,7 @@ var _gaq = _gaq || [];
     return this.items[this.index];
   };
   Playlist.prototype.getCurrentUrl = function() {
-    //return 'NKhvFcB-dWU';
+    return 'NKhvFcB-dWU';
     if (this.current()) {
       return this.items[this.index].url;
     }
@@ -117,9 +117,6 @@ var _gaq = _gaq || [];
 
       playMixtape : function(id) {
         var ctx = this;
-        var tplayer = document.getElementById("tplayer");
-        tplayer.loadVideoById('NKhvFcB-dWU');
-        return true;
         this.loadMixtape(id, function(mixtape){
           ctx.playlist.setItems(mixtape.contributions);
           ctx.player.jPlayer("setFile", ctx.playlist.getCurrentUrl()).jPlayer('play');
@@ -151,8 +148,9 @@ var _gaq = _gaq || [];
         ctx.player.jPlayer({
           swfPath: '/javascripts/lib/jplayer',
           volume: 50,
+          youTubeSupport: true,
           ready: function(){
-            this.element.jPlayer('setFile', ctx.playlist.getCurrentUrl());
+            //this.element.jPlayer('setFile', ctx.playlist.getCurrentUrl());
           }
         }).jPlayer('onSoundComplete', function(){
           ctx.gotoNextTrack();
@@ -297,11 +295,6 @@ var _gaq = _gaq || [];
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();
-
-    swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=player",
-      "player", "425", "1", "8", null, null, 
-      {allowScriptAccess: "always"}, {id: 'tplayer'}
-      );
 
     app.run('#/');
   });
