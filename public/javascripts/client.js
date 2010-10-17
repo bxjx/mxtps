@@ -156,8 +156,10 @@ var _gaq = _gaq || [];
         });
 
         $('#play-mixtape').live('click', function(){
-          var currentMixtapeId = location.hash.replace(/^#\/mixtapes\/([0-9a-f]+)$/, '$1');
-          ctx.playMixtape(currentMixtapeId);
+          if (location.hash){
+            var currentMixtapeId = location.hash.replace(/^#\/mixtapes\/([0-9a-f]+)$/, '$1');
+            ctx.playMixtape(currentMixtapeId);
+          }
         });
 
         $('.jp-next').live('click', function(){

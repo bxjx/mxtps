@@ -45,14 +45,18 @@ exports.forThisContributionOnYoutube = function(mixtape, contribution){
     response.on('data', function (data) { body += data; });
     response.on('end', function () {
       var results = JSON.parse(body);
-      var url = results['feed']['entry'][0]['id']['$t'];
-      console.info("found " + url);
-      contribution.url = url;
-      contribution.url_status = 200;
-      contribution.status = 'found';
-      mixtape.save(function(){
-        MxtpsEvent.publishMp3Ok(mixtape, contribution);
-      });
+      try{
+        var url = results['feed']['entry'][0]['id']['$t'].substr(42);
+        console.info("found " + url);
+        contribution.url = url;
+        contribution.url_status = 200;
+        contribution.status = 'found';
+        mixtape.save(function(){
+          MxtpsEvent.publishMp3Ok(mixtape, contribution);
+        });
+      }catch(e){
+        console.info("couldn't find url");
+      }
     });
   });
 };
