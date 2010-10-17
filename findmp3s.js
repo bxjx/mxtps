@@ -45,7 +45,14 @@ exports.forThisContributionOnYoutube = function(mixtape, contribution){
     response.on('data', function (data) { body += data; });
     response.on('end', function () {
       var results = JSON.parse(body);
-      console.log(JSON.stringify(results['feed']['entry'][0]['link'][0]['href']));
+      var url = results['feed']['entry'][0]['id']['$t'];
+      console.info("found " + url);
+      contribution.url = url;
+      contribution.url_status = 200;
+      contribution.status = 'found';
+      mixtape.save(function(){
+        MxtpsEvent.publishMp3Ok(mixtape, contribution);
+      });
     });
   });
 };

@@ -23,7 +23,6 @@ var _gaq = _gaq || [];
     return this.items[this.index];
   };
   Playlist.prototype.getCurrentUrl = function() {
-    return 'NKhvFcB-dWU';
     if (this.current()) {
       return this.items[this.index].url;
     }
@@ -150,7 +149,7 @@ var _gaq = _gaq || [];
           volume: 50,
           youTubeSupport: true,
           ready: function(){
-            //this.element.jPlayer('setFile', ctx.playlist.getCurrentUrl());
+            this.element.jPlayer('setFile', ctx.playlist.getCurrentUrl());
           }
         }).jPlayer('onSoundComplete', function(){
           ctx.gotoNextTrack();

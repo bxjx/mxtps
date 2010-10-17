@@ -81,7 +81,7 @@ app.post('/mixtapes/:id/contributions', function(req, res){
           if (contribution.url_status == 200){
             MxtpsEvent.publishMp3Ok(mixtape, contribution);
           }else{
-            findmp3s.forThisContribution(mixtape, contribution);
+            findmp3s.forThisContributionOnYoutube(mixtape, contribution);
           }
         });
       }else{
